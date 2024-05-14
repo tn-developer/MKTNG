@@ -1,0 +1,93 @@
+﻿@model pcg.Models.AdminModel
+@{
+    ViewData["Title"] = "Admin Page";
+}
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+</head>
+<h1 style="text-align:center">Newest Task</h1>
+<table class="table table-hover table-responsive-sm table-sm">
+    <thead>
+        <tr>
+            <th class="text-center text-uppercase">Task No.</th>
+            <th class="text-center text-uppercase">Task</th>
+            <th class="text-center text-uppercase">Remarks</th>
+            <th class="text-center text-uppercase">Description</th>
+            <th class="text-center text-uppercase">Assignee</th>
+            <th class="text-center text-uppercase">Client/Site</th> 
+            <th class="text-center text-uppercase">Date</th>
+        </tr>
+    </thead>
+    <tbody id="myTable" class="viewbag-data">
+        @foreach (System.Data.DataRow dr in ViewBag.startdate.Rows)
+        {
+        <tr>
+            <td class="text-center text-nowrap">@dr["TaskId"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["Task"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["Remarks"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["Description"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["Name"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["Site"].ToString() @dr["Client"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["DateStart"].ToString()</td>
+        </tr>
+        }
+    </tbody>
+</table>
+<h1 style="text-align:center">Recent Forwarded Task</h1>
+<table class="table table-hover table-responsive-sm table-sm">
+    <thead>
+        <tr>
+            <th class="text-center text-uppercase">Task No.</th>
+            <th class="text-center text-uppercase">Task</th>
+            <th class="text-center text-uppercase">Remarks</th>
+            <th class="text-center text-uppercase">Description</th>
+            <th class="text-center text-uppercase">Assignee</th>
+            <th class="text-center text-uppercase">Client/Site</th> 
+            <th class="text-center text-uppercase">Date</th>
+        </tr>
+    </thead>
+    <tbody id="myTable" class="viewbag-data">
+        @foreach (System.Data.DataRow dr in ViewBag.fwddate.Rows)
+        {
+        <tr>
+            <td class="text-center text-nowrap">@dr["TaskId"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["Task"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["Remarks"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["Description"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["Name"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["Site"].ToString() @dr["Client"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["DateFwd"].ToString()</td>
+        </tr>
+        }
+    </tbody>
+</table>
+<h1 style="text-align:center">Recent Approved Task</h1>
+<table class="table table-hover table-responsive-sm table-sm">
+    <thead>
+        <tr>
+            <th class="text-center text-uppercase">Task No.</th>
+            <th class="text-center text-uppercase">Task</th>
+            <th class="text-center text-uppercase">Remarks</th>
+            <th class="text-center text-uppercase">Description</th>
+            <th class="text-center text-uppercase">Assignee</th>
+            <th class="text-center text-uppercase">Client/Site</th> 
+            <th class="text-center text-uppercase">Date</th>
+        </tr>
+    </thead>
+    <tbody id="myTable" class="viewbag-data">
+        @foreach (System.Data.DataRow dr in ViewBag.rcvdate.Rows)
+        {
+        <tr>
+            <td class="text-center text-nowrap">@dr["TaskId"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["Task"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["Remarks"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["Description"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["Name"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["Site"].ToString() @dr["Client"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["DateRcv"].ToString()</td>
+        </tr>
+        }
+    </tbody>
+</table>

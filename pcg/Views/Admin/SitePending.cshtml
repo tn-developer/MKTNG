@@ -1,0 +1,47 @@
+﻿@model pcg.Models.SitesModel
+
+@{
+    ViewData["Title"] = "Sites";
+} 
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+</head>
+<div>
+<h1 style="text-align:center">Site Approval</h1>
+</div>
+<table class="table table-hover table-responsive-sm table-sm">
+    <thead>
+        <tr>
+            <th class="text-center text-uppercase">Client</th>
+            <th class="text-center text-uppercase">Site</th>
+            <th class="text-center text-uppercase">Status</th>
+            <th class="text-center text-uppercase">Action</th>
+        </tr>
+    </thead>
+    <tbody id="myTable">
+        @foreach (System.Data.DataRow dr in ViewBag.Sitelist.Rows)
+        {
+            <tr>
+                <td class="text-center" style="width: 25%;">@dr["Client"].ToString()</td>
+                <td class="text-center" style="width: 25%;">@dr["Site"].ToString()</td>
+                <td class="text-center" style="width: 25%;">@dr["Status"].ToString()</td>
+                <td class="text-center" style="width: 25%;">
+                    <div class="d-flex justify-content-center">
+                        <form asp-action="SiteApproval" method="post" class="mr-2">
+                            <input type="hidden" asp-for="SiteId" value="@dr["SiteId"].ToString()" />
+                            <input type="hidden" name="status" value="0" />
+                            <input type="submit" value="Approve" class="btn btn-primary" />
+                        </form>
+                        <form asp-action="SiteApproval" method="post">
+                            <input type="hidden" asp-for="SiteId" value="@dr["SiteId"].ToString()" />
+                            <input type="hidden" name="status" value="1" />
+                            <input type="submit" value="Decline" class="btn btn-danger" />
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

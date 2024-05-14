@@ -1,0 +1,73 @@
+﻿@model pcg.Models.VariationModel
+
+@{
+    ViewData["Title"] = "History";
+}
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+</head>
+<h1 style="text-align:center">Tasks Log</h1>
+<input class="form-control" type="text" id="search" placeholder="Search here" onkeyup="searchTable()">
+<table class="table table-hover table-responsive-sm table-sm">
+    <thead>
+        <tr>
+            <th class="text-center text-uppercase">Log No.</th>
+            <th class="text-center text-uppercase">Task No.</th>
+            <th class="text-center text-uppercase">Assigned/Forwarded</th>
+            <th class="text-center text-uppercase">Added By</th>
+            <th class="text-center text-uppercase">Client/Site</th>
+            <th class="text-center text-uppercase">Status</th>
+            <th class="text-center text-uppercase">Process</th>
+            <th class="text-center text-uppercase">Task/Remarks</th>
+            <th class="text-center text-uppercase">Date Start</th>
+            <th class="text-center text-uppercase">Date Forwarded</th>
+            <th class="text-center text-uppercase">Date Received</th>
+            <th class="text-center text-uppercase">Date Completed</th>         
+        </tr>
+    </thead>
+    <tbody id="myTable" class="viewbag-data">
+        @foreach (System.Data.DataRow dr in ViewBag.Tasklog.Rows)
+        {
+        <tr>
+            <td class="text-center text-nowrap">@dr["LogId"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["TaskId"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["Name"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["AddedBy"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["Client"].ToString() @dr["Site"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["Status"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["Process"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["TR"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["DateStart"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["DateFwd"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["DateRcv"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["DateClr"].ToString()</td>
+        </tr>
+        }
+    </tbody>
+</table>
+<script>
+    function searchTable() {
+        var input, filter, table, tr, td, i, txtValue;
+        input = document.getElementById("search");
+        filter = input.value.toUpperCase();
+        table = document.getElementById("myTable");
+        tr = table.getElementsByTagName("tr");
+
+        for (i = 0; i < tr.length; i++) {
+            td = tr[i].getElementsByTagName("td");
+            for (var j = 0; j < td.length; j++) {
+                if (td[j]) {
+                    txtValue = td[j].textContent || td[j].innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                        break;
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    }
+</script>

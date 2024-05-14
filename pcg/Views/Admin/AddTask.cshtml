@@ -1,0 +1,137 @@
+﻿@model pcg.Models.VariationModel
+
+@{
+    ViewData["Title"] = "Add Task";
+}
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+</head>
+<h1 style="text-align:center">Add Task</h1>
+
+@foreach (System.Data.DataRow dr in ViewBag.Sitelist.Rows)
+        {
+            <h6>Site: @dr["Client"].ToString() @dr["Site"].ToString()</h6>
+            <h6>OM: @dr["SiteOM"].ToString()</h6>
+            <h6>Site Id: @dr["SiteId"].ToString()</h6>
+        }       
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="AddTask">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="Task" class="control-label">Task</label>
+        <input asp-for="Task" class="form-control"/>
+    </div>                      
+    <div class="form-group">
+        <label asp-for="Remarks" class="control-label">Remarks</label>
+        <input asp-for="Remarks" class="form-control"/>
+    </div>
+    <div class="form-group">
+                    <label asp-for="Description" class="control-label"></label>
+                    <select id="desc" asp-for="Description" class="form-control" onchange="showoptions()">
+                        <option value="Query" selected>Query</option>
+                        <option value="Variation">Variation</option>
+                        <option value="Document Request">Document Request</option>
+                    </select>
+                </div>
+                <div id="query" class="form-group" style="display: block;">
+                    <label for="queryoption" asp-for="Descquery" class="control-label">Query</label>
+                        <select id="queryoption" asp-for="Descquery" class="form-control">
+                            <option value="Plan">Plan</option>
+                            <option value="Contract/Billing">Contract/Billing</option>
+                            <option value="Schedule">Schedule</option>
+                            <option value="Finishing">Finishing</option>
+                        </select>
+                </div>
+                <div id="vary" class="form-group" style="display: none;">
+                    <label for="varyoption" asp-for="Descvary" class="control-label">Variation</label>
+                        <select id="varyoption" asp-for="Descvary" class="form-control">
+                            <option value="Owner's Instruction">Owner's Instruction</option>
+                            <option value="Subcon">Subcon</option>                           
+                        </select>
+                </div>
+                <div id="docreq" class="form-group" style="display: none;">
+                    <label for="docreqoption" asp-for="Descdocreq" class="control-label">Document Request</label>
+                        <select id="docreqoption" asp-for="Descdocreq" class="form-control">
+                            <option value="Plan">Plan</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Schedule">Schedule</option>
+                            <option value="Finishing">Finishing</option>
+                        </select>
+                </div>
+            <div class="form-group">
+                <label asp-for="AssignId" class="control-label">Assign To</label>
+                <select asp-for="AssignId" class="form-control">
+                    @foreach (System.Data.DataRow dr in ViewBag.Userlist.Rows)
+                    {
+                        <option value="@dr["Id"].ToString()">@dr["Name"].ToString(): @dr["Position"].ToString()</option>
+                    }
+                </select>
+            </div>
+    <div class="form-group">
+            @foreach (System.Data.DataRow dr in ViewBag.Sitelist.Rows)
+            {
+            <form asp-action="AddTask" method="post">
+                <input type="hidden" name="SiteReqId" value="@dr["SiteId"].ToString()"/>
+                <button type="submit" href="@Url.Action("AddTask", "Admin", new { siteId = dr["SiteId"].ToString() }) "class="btn btn-primary btn-block">Add Task</button>
+            </form>
+            }           
+    </div>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+<script>
+    function showoptions() {
+        var desc = document.getElementById("desc").value;
+        var queryDiv = document.getElementById("query");
+        var queryOption = document.getElementById("queryoption");
+        var docreqDiv = document.getElementById("docreq");
+        var docreqOption = document.getElementById("docreqoption");
+        var varyDiv = document.getElementById("vary");
+        var varyOption = document.getElementById("varyoption");
+
+        if (desc === "Query") 
+        {
+            queryDiv.style.display = "block";
+            queryOption.value = "Plan";
+            docreqDiv.style.display = "none";
+            docreqOption.value = "";
+            varyDiv.style.display = "none";
+            varyOption.value = "";
+        } 
+        else if (desc === "Document Request") 
+        {
+            docreqDiv.style.display = "block";
+            docreqOption.value = "Plan";
+            queryDiv.style.display = "none";
+            queryOption.value = "";
+            varyDiv.style.display = "none";
+            varyOption.value = "";
+        }
+        else if (desc === "Variation") 
+        {
+            varyDiv.style.display = "block";
+            varyOption.value = "Owner's Instruction";
+            queryDiv.style.display = "none";
+            queryOption.value = "";
+            docreqDiv.style.display = "none";
+            docreqOption.value = "";
+        }
+        else 
+        {
+            queryDiv.style.display = "none";
+            docreqDiv.style.display = "none";
+            varyDiv.style.display = "none";
+            queryOption.value = "";
+            docreqOption.value = "";
+            varyOption.value = "";
+        }
+    }
+    showoptions();
+</script>

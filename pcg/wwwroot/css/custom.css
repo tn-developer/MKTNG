@@ -1,0 +1,68 @@
+﻿.sidebar {
+    height: 100%;
+    width: 18%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    background-color: #f7f786;
+    padding-top: 0px; /* Adjust this according to your top bar height */
+}
+.sidebar-header {
+    text-align: center;
+    padding: 10px;
+    margin-top: 0; /* Add margin-top to move it to the very top */
+    background-color: #fff952; /* Optional: Change background color */
+    color: black; /* Optional: Change text color */
+    font-weight: bold;
+    cursor: pointer;
+}
+.container {
+    width: 82%;
+    margin-left: 18%;
+}
+
+.sidebar a {
+    padding: 6px;
+    text-decoration: none;
+    font-size: 20px;
+    color: black;
+    display: block;
+}
+
+    .sidebar a:hover {
+        background-color: #fff952;
+        font-weight: bold;
+    }
+
+/* Media Query for smaller screens */
+@media (min-width: 768px) {
+    .sidebar {
+        height: 8%;
+        width: 100%;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: #f7f786;
+        padding-top: 0px; /* Adjust this according to your top bar height */
+    }
+
+    .sidebar-header {
+        text-align: center;
+        padding: 10px;
+        margin-top: 0; /* Add margin-top to move it to the very top */
+        background-color: #fff952; /* Optional: Change background color */
+        color: black; /* Optional: Change text color */
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    .container {
+        height: 100%;
+        width: 100%;
+        margin-top: 8%;
+    }
+
+    .sidebar a {
+        font-size: 18px;
+    }
+}

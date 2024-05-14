@@ -1,0 +1,42 @@
+﻿@model pcg.Models.VariationModel
+
+@{
+    ViewData["Title"] = "Task Detail";
+}
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+</head>
+<h1 style="text-align:center">Task Details</h1>
+<table class="table table-hover table-responsive-sm table-sm">
+    <thead>
+        <tr>
+            <th class="text-center text-uppercase">Task No.</th>
+            <th class="text-center text-uppercase">Task</th>
+            <th class="text-center text-uppercase">Remarks</th> 
+            <th class="text-center text-uppercase">Description</th>
+            <th class="text-center text-uppercase">Added By</th>
+            <th class="text-center text-uppercase">Date Forwarded</th>
+            <th class="text-center text-uppercase">Date Received</th>
+            <th class="text-center text-uppercase">Assigned To</th>
+            <th class="text-center text-uppercase">Status</th>
+        </tr>
+    </thead>
+    <tbody id="myTable">
+        @foreach (System.Data.DataRow dr in ViewBag.Tasklog.Rows)
+        {
+            <tr>
+                <td class="text-center text-nowrap">@dr["TaskID_Tasks"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["Task"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["Remarks"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["Description"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["AddedBy"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["DateFwd"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["DateRcv"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["Name"].ToString()</td>
+                <td>Waiting approval</td>
+        </tr>
+        }
+    </tbody>
+</table>

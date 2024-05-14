@@ -1,0 +1,45 @@
+﻿@model pcg.Models.ChangeInfo
+
+@{
+    ViewData["Title"] = "Update Profile";
+}
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+</head>
+<h1 style="text-align:center">Update Profile Info</h1>
+
+<div class="row">
+    <div class="col-md-12">
+        <form asp-action="ChangeInfo">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="Name" class="control-label"></label>
+        <input asp-for="Name" class="form-control" placeholder=@Model.CurName/>
+    </div>                      
+    <div class="form-group">
+        <label asp-for="Email" class="control-label"></label>
+        <input asp-for="Email" class="form-control" placeholder=@Model.CurEmail/>
+    </div>
+    <div class="form-group">
+        <label asp-for="ContactNo" class="control-label"></label>
+        <input asp-for="ContactNo" class="form-control" placeholder=@Model.CurContact/>
+    </div>
+    <div class="form-group">
+        <label asp-for="Password" class="control-label"></label>
+        <input asp-for="Password" type="password" class="form-control"/>
+
+        <label asp-for="Confirm" class="control-label"></label>
+        <input asp-for="Confirm" type="password" class="form-control"/>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Update Info" asp-action="ChangeInfo" class="btn btn-primary" />
+    </div>
+        </form>
+    </div>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

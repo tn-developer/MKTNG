@@ -1,0 +1,65 @@
+﻿@model pcg.Models.ProcessModel
+
+@{
+    ViewData["Title"] = "Forwarded";
+}
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+</head>
+<h1 style="text-align:center">Forwarded Task</h1>
+<table class="table table-hover table-responsive-sm table-sm">
+    <thead>
+        <tr>
+            <th class="text-center text-uppercase">Task No.</th>
+            <th class="text-center text-uppercase">Task Info</th>
+            <th class="text-center text-uppercase">Client/Site</th>
+            <th class="text-center text-uppercase">Added By</th>
+            <th class="text-center text-uppercase">Date Forwarded</th>
+            <th class="text-center text-uppercase">Date Received</th>
+            <th class="text-center text-uppercase">Assignee</th>
+            <th class="text-center text-uppercase">Approve</th>
+        </tr>
+    </thead>
+    <tbody id="myTable">
+        @foreach (System.Data.DataRow dr in ViewBag.Tasklog.Rows)
+        {
+            <tr onclick="toggleRows(this)">
+                <td class="text-center text-nowrap">@dr["TaskId"].ToString()</td>
+                @if ((int)dr["Circulation"] >= 1)
+                {
+                    int cir = (int)dr["Circulation"] + 1;
+                    <td class="text-center text-nowrap" style="font-weight: bold;">@dr["Task"].ToString() @dr["Remarks"].ToString() @dr["Description"].ToString() v@(cir)</td>
+                }
+                else
+                {
+                    <td class="text-center text-nowrap" style="font-weight: bold;">@dr["Task"].ToString() @dr["Remarks"].ToString() @dr["Description"].ToString()</td>
+                }
+                <td class="text-center text-nowrap">@dr["Client"].ToString() @dr["Site"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["AddedBy"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["DateFwd"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["DateRcv"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["Namef"].ToString()</td>
+                <td>
+                    @if (dr["Status"].ToString() == "Pending")
+                    {
+                        <form asp-controller="Admin" asp-action="Approve" method="post">
+                            <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()" />
+                            <input type="hidden" asp-for="FwdId" value="@dr["ForwardId"].ToString()"/>
+                            <input type="hidden" asp-for="Task" value="@dr["TaskRename"].ToString()"/>
+                            <input type="hidden" asp-for="Remarks" value="@dr["RemarksRename"].ToString()"/>
+                            <input type="hidden" asp-for="Code" value="@dr["Process"].ToString()"/>
+                            <button type="submit" class="btn btn-primary btn-block">Approve</button>
+                        </form>
+                    }
+                    else
+                    {
+                        <a asp-controller="Admin" asp-action="TaskForward" asp-route-taskId="@dr["TaskId"].ToString()" class="btn btn-primary btn-block">Forward</a>
+                    }
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>

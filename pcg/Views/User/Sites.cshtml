@@ -1,0 +1,186 @@
+﻿@model pcg.Models.VariationModel
+
+@{
+    ViewData["Title"] = "Sites";
+} 
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap5.css">
+</head>
+<div>
+<h1 style="text-align:center">Sites</h1>
+</div>
+<table class="table table-hover table-responsive-sm table-sm">
+    <thead>
+        <tr>
+            <th class="text-center text-uppercase">Client</th>
+            <th class="text-center text-uppercase">Site</th>
+            <th class="text-center text-uppercase">OM</th>
+            <th class="text-center text-uppercase"> SC/TK</th>
+            <th class="text-center text-uppercase">Details</th>
+        </tr>
+    </thead>
+    <tbody id="myTable">
+        @foreach (System.Data.DataRow dr in ViewBag.Sitelist.Rows)
+        {
+        <tr>
+            <td class="text-center text-nowrap">@dr["Client"].ToString()</td>
+            <td class="text-center text-nowrap">@dr["Site"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["OMName"].ToString()@dr["SOMName"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["SCName"].ToString()@dr["TKName"].ToString()</td>
+            <td class="text-center text-nowrap">
+                    <div class="modal fade" id="AddTask_@dr["SiteId"].ToString()" tabindex="-1" aria-labelledby="AddTaskModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="AddTaskModalLabel">Add Site</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <p>Add Task for @dr["SiteId"].ToString(): @dr["Client"].ToString() @dr["Site"].ToString() </p>
+                                    <div class="col-md-12">
+                                        <form asp-action="AddTask">
+                                            <div asp-validation-summary="All" class="text-danger"></div>
+                                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                                                <div class="form-group">
+                                                    <label asp-for="Task" class="control-label">Task</label>
+                                                    <input asp-for="Task" class="form-control"/>
+                                                </div>                      
+                                                <div class="form-group">
+                                                    <label asp-for="Remarks" class="control-label">Remarks</label>
+                                                    <input asp-for="Remarks" class="form-control"/>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label asp-for="Description" class="control-label"></label>
+                                                <select id="desc_@dr["SiteId"].ToString()" asp-for="Description" class="form-control" onchange="showoptions(@dr["SiteId"].ToString())">
+                                                    <option value="Query" selected>Query</option>
+                                                    <option value="Variation">Variation</option>
+                                                    <option value="Document Request">Document Request</option>
+                                                </select>
+                                                </div>
+                                            <div id="query_@dr["SiteId"].ToString()" class="form-group" style="display: block;">
+                                                <label for="queryoption_@dr["SiteId"].ToString()" asp-for="Descquery" class="control-label">Query</label>
+                                                <select id="queryoption_@dr["SiteId"].ToString()" asp-for="Descquery" class="form-control">
+                                                    <option value="Plan">Plan</option>
+                                                    <option value="Contract/Billing">Contract/Billing</option>
+                                                    <option value="Schedule">Schedule</option>
+                                                    <option value="Finishing">Finishing</option>
+                                                </select>
+                                                </div>
+                                            <div id="vary_@dr["SiteId"].ToString()" class="form-group" style="display: none;">
+                                                    <label for="varyoption" asp-for="Descvary" class="control-label">Variation</label>
+                                                <select id="varyoption_@dr["SiteId"].ToString()" asp-for="Descvary" class="form-control">
+                                                    <option value="Owner's Instruction">Owner's Instruction</option>
+                                                    <option value="Subcon">Subcon</option>                           
+                                                </select>
+                                            </div>
+                                            <div id="docreq_@dr["SiteId"].ToString()" class="form-group" style="display: none;">
+                                                <label for="docreqoption_@dr["SiteId"].ToString()" asp-for="Descdocreq" class="control-label">Document Request</label>
+                                                <select id="docreqoption_@dr["SiteId"].ToString()" asp-for="Descdocreq" class="form-control">
+                                                    <option value="Plan">Plan</option>
+                                                    <option value="Contract">Contract</option>
+                                                    <option value="Schedule">Schedule</option>
+                                                    <option value="Finishing">Finishing</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                    <label asp-for="AssignId" class="control-label">Assign To</label>
+                                                    <select asp-for="AssignId" class="form-control">
+                                                        @foreach (System.Data.DataRow udr in ViewBag.Userlist.Rows)
+                                                        {
+                                                        <option value="@udr["Id"].ToString()">@udr["Name"].ToString(): @udr["Position"].ToString()</option>
+                                                        }
+                                                    </select>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <input type="hidden" asp-for="SiteReqId" value="@dr["SiteId"].ToString()" />
+                                                <button type="button" class="btn btn-primary" onclick="confirmAddTask('@dr["SiteId"].ToString()')">Confirm</button>
+                                                <button type="button" class="btn btn-secondary" onclick="closeAddTask('@dr["SiteId"].ToString()')">Cancel</button>
+                                            </div>
+                                        </form>
+                                     </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                <div style="text-align:center">
+                    <a href="@Url.Action("TaskDetail", "User", new { siteId = dr["SiteId"] })">Task Details</a> |
+                        <a href="#" onclick="preload(@dr["SiteId"].ToString())" data-bs-toggle="modal" data-bs-target="#AddTask_@dr["SiteId"].ToString()">Add Task</a>
+                </div>
+            </td>
+        </tr>
+        }
+    </tbody>
+</table>
+
+@section scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js"></script>
+    <script>
+        function openAddTask(siteId) {
+            $('#AddTask_' + siteId).modal('show');
+        }
+        function closeAddTask(siteId) {
+            $('#AddTask_' + siteId).modal('hide');
+        }
+        function confirmAddTask(siteId) {
+            $('#AddTask_' + siteId).modal('hide');
+            var form = $('#AddTask_' + siteId).find('form');
+            form.submit();
+        }
+
+        function preload(siteId) {
+            document.getElementById("queryoption_" + siteId).value = "Plan";
+            document.getElementById("docreqoption_" + siteId).value = "";
+            document.getElementById("varyoption_" + siteId).value = "";
+        }
+
+        function showoptions(siteId) {
+            var desc = document.getElementById("desc_" + siteId).value;
+            var queryDiv = document.getElementById("query_" + siteId);
+            var queryOption = document.getElementById("queryoption_" + siteId);
+            var docreqDiv = document.getElementById("docreq_" + siteId);
+            var docreqOption = document.getElementById("docreqoption_" + siteId);
+            var varyDiv = document.getElementById("vary_" + siteId);
+            var varyOption = document.getElementById("varyoption_" + siteId);            
+
+            if (desc === "Query") {
+                queryDiv.style.display = "block";
+                queryOption.value = "Plan";
+                docreqDiv.style.display = "none";
+                docreqOption.value = "";
+                varyDiv.style.display = "none";
+                varyOption.value = "";
+            }
+            else if (desc === "Document Request") {
+                docreqDiv.style.display = "block";
+                docreqOption.value = "Plan";
+                queryDiv.style.display = "none";
+                queryOption.value = "";
+                varyDiv.style.display = "none";
+                varyOption.value = "";
+            }
+            else if (desc === "Variation") {
+                varyDiv.style.display = "block";
+                varyOption.value = "Owner's Instruction";
+                queryDiv.style.display = "none";
+                queryOption.value = "";
+                docreqDiv.style.display = "none";
+                docreqOption.value = "";
+            }
+            else {
+                queryDiv.style.display = "none";
+                docreqDiv.style.display = "none";
+                varyDiv.style.display = "none";
+                queryOption.value = "";
+                docreqOption.value = "";
+                varyOption.value = "";
+            }
+        }
+    </script>
+}

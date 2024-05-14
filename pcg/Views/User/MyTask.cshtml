@@ -1,0 +1,279 @@
+﻿@model pcg.Models.ProcessModel
+
+@{
+    ViewData["Title"] = "My Task";
+}
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap5.css">
+</head>
+<h1 style="text-align:center">My Task</h1>
+<table class="table table-hover table-responsive-sm table-sm">
+    <thead>
+        <tr>
+            <th class="text-center text-uppercase">Task No.</th>
+            <th class="text-center text-uppercase">Task Info</th>
+            <th class="text-center text-uppercase">Client/Site</th>
+            <th class="text-center text-uppercase">Added By</th>
+            <th class="text-center text-uppercase">Date Forwarded</th>
+            <th class="text-center text-uppercase">Date Received</th>
+            <th class="text-center text-uppercase">Assignee</th>
+            <th class="text-center text-uppercase">Action</th>
+        </tr>
+    </thead>
+    <tbody id="myTable">
+        @foreach (System.Data.DataRow dr in ViewBag.MyTasks.Rows)
+        {
+            <tr data-taskid="@dr["TaskId"].ToString()">
+                <td class="text-center text-nowrap">@dr["TaskId"].ToString()</td>
+                @if ((int)dr["Circulation"] >= 1)
+                {
+                    int cir = (int)dr["Circulation"] + 1;
+                    <td class="text-center text-nowrap" style="font-weight: bold;">
+                        @dr["Task"].ToString() @dr["Remarks"].ToString() @dr["Description"].ToString() v@(cir)
+                    </td>
+                }
+                else
+                {
+                    <td class="text-center text-nowrap" style="font-weight: bold;">@dr["Task"].ToString() @dr["Remarks"].ToString() @dr["Description"].ToString()</td>
+                }
+                <td class="text-center text-nowrap">@dr["Client"].ToString() @dr["Site"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["AddedBy"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["DateFwd"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["DateRcv"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["Name"].ToString()</td>
+                <td>
+                    @if (dr["Process"].ToString() == "Q7")
+                    {
+                        <div class="modal fade" id="Revise_@dr["TaskId"].ToString()" tabindex="-1" aria-labelledby="reviseModal_@dr["TaskId"].ToString()" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="reviseModal_@dr["TaskId"].ToString()">Revise</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeRevise('@dr["TaskId"].ToString()')"></button>
+                                    </div>
+                                    <form asp-controller="Admin" asp-action="Revise" method="post">
+                                        <div class="modal-body">
+                                            <div class="form-group">
+                                                <label asp-for="Task" class="control-label">Change Task Name (Optional)</label>
+                                                <input asp-for="Task" class="form-control" value="@dr["Task"].ToString()" placeholder="@dr["Task"].ToString()" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label asp-for="Remarks" class="control-label">Change Remarks (Optional)</label>
+                                                <input asp-for="Remarks" class="form-control" value="@dr["Remarks"].ToString()" placeholder="@dr["Remarks"].ToString()" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label asp-for="Code" class="control-label">Process</label>
+                                                <select asp-for="Code" class="form-control">
+                                                    @foreach (System.Data.DataRow dar in ViewBag.Process.Rows)
+                                                    {
+                                                        <option value="@dar["Code"].ToString()">@dar["Process"].ToString()</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group">
+                                                <label asp-for="AssignId" class="control-label">Select Assignee</label>
+                                                <select asp-for="AssignId" class="form-control" id="assigneeSelect">
+                                                    @foreach (System.Data.DataRow dar in ViewBag.Users.Rows)
+                                                    {
+                                                        <option value="@dar["Id"].ToString()">@dar["Name"].ToString(): @dar["Position"].ToString()</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()" />
+                                            <input type="hidden" asp-for="Task" value="@dr["Task"].ToString()" />
+                                            <input type="hidden" asp-for="Remarks" value="@dr["Remarks"].ToString()" />
+                                            <button type="button" class="btn btn-outline-warning" onclick="confirmRevise('@dr["TaskId"].ToString()')">Confirm</button>
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="closeRevise('@dr["TaskId"].ToString()')">Close</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="Clr_@dr["TaskId"].ToString()" tabindex="-1" aria-labelledby="clrModal_@dr["TaskId"].ToString()" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="clrModal_@dr["TaskId"].ToString()l">Complete</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="closeClr('@dr["TaskId"].ToString()')" aria-label="Close"></button>
+                                    </div>
+                                    <form asp-controller="Admin" asp-action="Complete" method="post">
+                                        <div class="modal-body">
+                                            <p>Are you sure this task is completed?</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()" />
+                                            <button type="button" class="btn btn-outline-warning" onclick="confirmClr('@dr["TaskId"].ToString()')">Confirm</button>
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="closeClr('@dr["TaskId"].ToString()')">Close</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex">
+                            <button type="button" class="btn btn-warning mr-1" data-bs-toggle="modal" data-bs-target="#Revise_@dr["TaskId"].ToString()">Revise</button>
+                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#Clr_@dr["TaskId"].ToString()">Complete</button>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="modal fade" id="Fwd_@dr["TaskId"].ToString()" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="fwdModal_@dr["TaskId"].ToString()" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="fwdModal_@dr["TaskId"].ToString()">Forward Task</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeFwd('@dr["TaskId"].ToString()')"></button>
+                                    </div>
+                                    <form asp-controller="Admin" asp-action="TaskForward" method="post">
+                                        <div class="modal-body">
+                                            <div style="display: flex; justify-content: center; width: 100%;">
+                                                <table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th class="text-center text-uppercase">Task No.</th>
+                                                            <th class="text-center text-uppercase">task info</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <tr>
+                                                            <td class="text-center text-nowrap">@dr["TaskId"].ToString()</td>
+                                                            <td class="text-center text-nowrap">@dr["Task"].ToString() @dr["Remarks"].ToString() @dr["Description"].ToString()</td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                            <div class="form-group">
+                                                <label asp-for="Task" class="control-label">Change Task Name (Optional)</label>
+                                                <input asp-for="Task" class="form-control" value="@dr["Task"].ToString()" placeholder="@dr["Task"].ToString()" />
+                                            </div>
+                                            <div class="form-group">
+                                                <label asp-for="Remarks" class="control-label">Change Remarks (Optional)</label>
+                                                <input asp-for="Remarks" class="form-control" value="@dr["Remarks"].ToString()" placeholder="@dr["Remarks"].ToString()" />
+                                            </div>
+
+                                            <div class="form-group" id="code">
+                                                <label for="codeOption_@dr["TaskId"].ToString()" asp-for="Code" class="control-label">Process</label>
+                                                <select id="codeOption_@dr["TaskId"].ToString()" asp-for="Code" class="form-control">
+                                                    @foreach (System.Data.DataRow dar in ViewBag.Process.Rows)
+                                                    {
+                                                        <option value="@dar["Code"].ToString()">@dar["Process"].ToString()</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                            <div class="form-group" id="assign_@dr["TaskId"].ToString()" style="display: block">
+                                                <label for="assignOption_@dr["TaskId"].ToString()" asp-for="AssignId" class="control-label">Select Assignee</label>
+                                                <select id="assignOption_@dr["TaskId"].ToString()" asp-for="AssignId" placeholder="Search...">
+                                                    @foreach (System.Data.DataRow dar in ViewBag.Users.Rows)
+                                                    {
+                                                        <option value="@dar["Id"].ToString()">@dar["Name"].ToString(): @dar["Position"].ToString()</option>
+                                                    }
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()" />
+                                            <button type="button" class="btn btn-primary" onclick="confirmFwd('@dr["TaskId"].ToString()')">Confirm</button>
+                                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" onclick="closeFwd('@dr["TaskId"].ToString()')">Close</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex">
+                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Fwd_@dr["TaskId"].ToString()">Forward</button>
+                        </div>
+                    }
+            </tr>
+        }
+    </tbody>
+</table>
+@section scripts {
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            $(document).ready(function () {
+                $('#myTable tr').click(function () {
+                    var Id = $(this).data('taskid');
+                    showoptions(Id);
+
+                    $('#assignOption_' + Id).selectize({
+                        allowEmptyOption: false,
+                        create: false,
+                        sortField: 'text',
+                    });
+                });
+            });
+
+            function showoptions(id) {
+                var codeOption = document.getElementById("codeOption_" + id).value;
+                var assignDiv = document.getElementById("assign_" + id);
+                var assignOption = document.getElementById("assignOption_" + id);
+
+                if (codeOption === "Q7") {
+                    assignDiv.style.display = "none";
+                    assignOption.value = "@ViewData["SessionId"]";
+                }
+                else {
+                    assignDiv.style.display = "block";
+                }
+            }
+
+            document.getElementById("codeOption_" + Id).addEventListener("change", function () {
+                var Id = this.value;
+                showoptions(Id);
+            });
+        });
+
+        function openRevise(taskId) {
+            $('#Revise_' + taskId).modal('show');
+        }
+
+        function confirmRevise(taskId) {
+            $('#Revise_' + taskId).modal('hide');
+            var form = $('#Revise_' + taskId).find('form');
+            form.submit();
+        }
+
+        function closeRevise(taskId) {
+            $('#Revise_' + taskId).modal('hide');
+        }
+
+        function openFwd(taskId) {
+            $('#Fwd_' + taskId).modal('show');
+        }
+
+        function confirmFwd(taskId) {
+            var form = $('#Fwd_' + taskId).find('form');
+            form.submit();
+            $('#Fwd_' + taskId).modal('hide');
+        }
+
+        function closeFwd(taskId) {
+            $('#Fwd_' + taskId).modal('hide');
+        }
+
+        function openClr(taskId) {
+            $('#Clr_' + taskId).modal('show');
+        }
+
+        function confirmClr(taskId) {
+            $('#Clr_' + taskId).modal('hide');
+            var form = $('#Clr_' + taskId).find('form');
+            form.submit();
+        }
+
+        function closeClr(taskId) {
+            $('#Clr_' + taskId).modal('hide');
+        }
+    </script>
+}
