@@ -59,11 +59,11 @@
                                         <div class="modal-body">
                                             <div class="form-group">
                                                 <label asp-for="Task" class="control-label">Change Task Name (Optional)</label>
-                                                <input asp-for="Task" class="form-control" value="@dr["Task"].ToString()" placeholder="@dr["Task"].ToString()" />
+                                                <input id="revtask_@dr["TaskId"].ToString()" asp-for="Task" class="form-control" value="@dr["Task"].ToString()" placeholder="@dr["Task"].ToString()" />
                                             </div>
                                             <div class="form-group">
                                                 <label asp-for="Remarks" class="control-label">Change Remarks (Optional)</label>
-                                                <input asp-for="Remarks" class="form-control" value="@dr["Remarks"].ToString()" placeholder="@dr["Remarks"].ToString()" />
+                                                <input id="revremarks_@dr["TaskId"].ToString()" asp-for="Remarks" class="form-control" value="@dr["Remarks"].ToString()" placeholder="@dr["Remarks"].ToString()" />
                                             </div>
                                             <div class="form-select" id="code">
                                                 <label for="codeOption_@dr["TaskId"].ToString()" asp-for="Code" class="control-label">Process</label>
@@ -86,8 +86,8 @@
                                         </div>
                                         <div class="modal-footer">
                                             <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()"/>
-                                            <input type="hidden" asp-for="Task" value="@dr["Task"].ToString()"/>
-                                            <input type="hidden" asp-for="Remarks" value="@dr["Remarks"].ToString()"/>
+                                            <input type="hidden" id="revtaskval_@dr["TaskId"].ToString()" value="@dr["Task"].ToString()" />
+                                            <input type="hidden" id="revremarksval_@dr["TaskId"].ToString()" value="@dr["Remarks"].ToString()" />
                                             <button type="button" class="btn btn-outline-primary" onclick="confirmRevise('@dr["TaskId"].ToString()')">Confirm</button>
                                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="closeRevise('@dr["TaskId"].ToString()')">Close</button>
                                         </div>
@@ -154,11 +154,11 @@
                                             </div>
                                             <div class="form-group">
                                                 <label asp-for="Task" class="control-label">Change Task Name (Optional)</label>
-                                                <input id="task_@dr["TaskId"].ToString()" asp-for="Task" class="form-control" value="@dr["Task"].ToString()" placeholder="@dr["Task"].ToString()" />
+                                                <input id="fwdtask_@dr["TaskId"].ToString()" asp-for="Task" class="form-control" value="@dr["Task"].ToString()" placeholder="@dr["Task"].ToString()" />
                                             </div>
                                             <div class="form-group">
                                                 <label asp-for="Remarks" class="control-label">Change Remarks (Optional)</label>
-                                                <input id="remarks_@dr["TaskId"].ToString()" asp-for="Remarks" class="form-control" value="@dr["Remarks"].ToString()" placeholder="@dr["Remarks"].ToString()" />
+                                                <input id="fwdremarks_@dr["TaskId"].ToString()" asp-for="Remarks" class="form-control" value="@dr["Remarks"].ToString()" placeholder="@dr["Remarks"].ToString()" />
                                             </div>
                                         
                                         <div class="form-select" id="code">
@@ -183,9 +183,8 @@
                                         <div class="modal-footer">
                                             <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()"/>
                                             <input type="hidden" asp-for="AssignId" value="@ViewData["SessionId"]"/>
-                                            <input type="hidden" value="@dr["TaskId"].ToString()" />
-                                            <input type="hidden" id="taskval_@dr["TaskId"].ToString()" value="@dr["Task"].ToString()" />
-                                            <input type="hidden" id="remarksval_@dr["TaskId"].ToString()" value="@dr["Remarks"].ToString()" />
+                                            <input type="hidden" id="fwdtaskval_@dr["TaskId"].ToString()" value="@dr["Task"].ToString()" />
+                                            <input type="hidden" id="fwdremarksval_@dr["TaskId"].ToString()" value="@dr["Remarks"].ToString()" />
                                             <button type="button" class="btn btn-outline-primary" onclick="confirmFwd('@dr["TaskId"].ToString()')">Confirm</button>
                                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="closeFwd('@dr["TaskId"].ToString()')">Close</button>
                                         </div>
@@ -245,6 +244,18 @@
         }
 
         function confirmRevise(taskId) {
+            var revtask = document.getElementById("revtask_" + taskId);
+            var revremarks = document.getElementById("revremarks_" + taskId);
+            var revtaskval = document.getElementById("revtaskval_" + taskId).value;
+            var revremarksval = document.getElementById("revremarksval_" + taskId).value;
+
+            if (revtask.value.trim() === "") {
+                revtask.value = revtaskval;
+            }
+            if (revremarks.value.trim() === "") {
+                revremarks.value = revremarksval;
+            }
+
             $('#Revise_' + taskId).modal('hide');
             var form = $('#Revise_' + taskId).find('form');
             form.submit();
@@ -259,16 +270,16 @@
         }
 
         function confirmFwd(taskId) {
-            var task = document.getElementById("task_" + taskId);
-            var remarks = document.getElementById("remarks_" + taskId);
-            var taskval = document.getElementById("taskval_" + taskId).value;
-            var remarksval = document.getElementById("remarksval_" + taskId).value;
+            var fwdtask = document.getElementById("fwdtask_" + taskId);
+            var fwdremarks = document.getElementById("fwdremarks_" + taskId);
+            var fwdtaskval = document.getElementById("fwdtaskval_" + taskId).value;
+            var fwdremarksval = document.getElementById("fwdremarksval_" + taskId).value;
 
-            if (task.value.trim() === "") {
-                task.value = taskval;
+            if (fwdtask.value.trim() === "") {
+                fwdtask.value = fwdtaskval;
             }
-            if (remarks.value.trim() === "") {
-                remarks.value = remarksval;
+            if (fwdremarks.value.trim() === "") {
+                fwdremarks.value = fwdremarksval;
             }
 
             var form = $('#Fwd_' + taskId).find('form');

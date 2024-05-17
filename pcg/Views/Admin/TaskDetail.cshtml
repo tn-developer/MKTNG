@@ -35,18 +35,22 @@
                 <td class="text-center text-nowrap">@dr["DateFwd"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["DateRcv"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["Name"].ToString()</td>
-                    @if(dr["Status"].ToString() == "Approved")
-                    {
-                    <td class="text-center text-nowrap" style="color: orangered;">In Progress</td>
-                    }
-                    else if(dr["Status"].ToString() == "Waiting" || dr["Status"].ToString() == "Pending")
-                    {
-                    <td class="text-center text-nowrap" style="color: purple">Pending</td>
-                    }
-                    else
-                    {
-                    <td class="text-center text-nowrap" style="color: green;">Completed!</td>
-                    }
+                @if (dr["Status"].ToString() == "Approved")
+                {
+                    <td class="text-center text-nowrap" style="color: orange; font-weight: bold">In Progress</td>
+                }
+                else if (dr["Status"].ToString() == "Waiting" || dr["Status"].ToString() == "Pending")
+                {
+                    <td class="text-center text-nowrap" style="color: purple; font-weight: bold">Pending</td>
+                }
+                else if (dr["Status"].ToString() == "Complete")
+                {
+                    <td class="text-center text-nowrap" style="color: green; font-weight: bold">Completed!</td>
+                }
+                else
+                {
+                    <td class="text-center text-nowrap" style="color: orangered; font-weight: bold">For approval</td>
+                }
             </tr>
         }
     </tbody>

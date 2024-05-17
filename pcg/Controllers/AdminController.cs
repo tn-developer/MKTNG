@@ -548,7 +548,8 @@ namespace pcg.Controllers
                 "ON t.AssignId = u.Id " +
                 "LEFT JOIN Sites s " +
                 "ON t.SiteReqId = s.SiteId " +
-                "WHERE t.SiteReqId = '" + s.SiteId + "' AND s.Status = 'Active'", con);
+                "WHERE t.SiteReqId = '" + s.SiteId + "' AND s.Status = 'Active' " +
+                "ORDER BY t.TaskId DESC", con);
             DataSet task = new DataSet();
             SqlDataAdapter tasks = new SqlDataAdapter(cmd);
             tasks.Fill(task, "slist");
@@ -1179,7 +1180,8 @@ namespace pcg.Controllers
                 "ON t.SiteReqId = s.SiteId " +
                 "LEFT JOIN Taskprocess p " +
                 "ON t.Process = p.Code " +
-                "WHERE t.Status = 'Approved' AND u.Name = '" + sesname + "' ", con);
+                "WHERE t.Status = 'Approved' AND u.Name = '" + sesname + "' " +
+                "ORDER BY t.TaskId DESC", con);
             DataSet task = new DataSet();
             SqlDataAdapter tasks = new SqlDataAdapter(cmd);
             tasks.Fill(task, "slist");

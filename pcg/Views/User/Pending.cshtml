@@ -71,7 +71,7 @@
                             </div>
                         </div>
 
-                        <div class="modal fade" id="DeclineModal_@dr["TaskId"]" tabindex="-1" role="dialog" aria-labelledby="DeclineModalLabel_@dr["TaskId"]" aria-hidden="true">
+                        <div class="modal fade" id="Decline_@dr["TaskId"]" tabindex="-1" role="dialog" aria-labelledby="DeclineModalLabel_@dr["TaskId"]" aria-hidden="true">
                             <div class="modal-dialog" role="document">
                                 <div class="modal-content">
                                     <div class="modal-header">
@@ -84,24 +84,23 @@
                                         Are you sure you want to decline this task with ID: @dr["TaskId"].ToString()?
                                     </div>
                                     <div class="modal-footer">
-                                        <form id="declineForm-@dr["TaskId"]" class="decline-form" asp-controller="User" asp-action="Decline" method="post">
+                                        <form id="declineForm_@dr["TaskId"]" class="decline-form" asp-controller="User" asp-action="Decline" method="post">
                                             <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()" />
                                             <input type="hidden" asp-for="AssignId" value="@dr["AssignId"].ToString()" />
                                             <input type="hidden" asp-for="Task" value="@dr["Task"].ToString()" />
                                             <input type="hidden" asp-for="Remarks" value="@dr["Remarks"].ToString()" />
                                             <input type="hidden" asp-for="Process" value="@dr["Code"].ToString()" />
-                                            <button type="button" class="btn btn-danger">Decline</button>
                                         </form>
-                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                        <button type="button" id="confirmDecline" class="btn btn-danger">Yes</button>
+                                        <button type="button" onclick="cancelDecline('@dr["TaskId"].ToString()')" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                                        <button type="button" onclick="confirmDecline('@dr["TaskId"].ToString()')" class="btn btn-danger">Yes</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="d-flex justify-content-between">
+                        <div class="d-flex justify-content-center">
                             <button type="button" class="btn btn-primary mr-1" data-bs-toggle="modal" data-bs-target="#Approve_@dr["TaskId"]">Approve</button>
-                            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#Decline_@dr["TaskId"].ToString()">Decline</button>
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#Decline_@dr["TaskId"].ToString()">Decline</button>
                         </div>
                     }
                     else
@@ -132,9 +131,18 @@
                 $('#Approve_' + taskId).modal('hide');
             }
 
-            $(document).on('click', '#confirmDecline', function () {
-                var form = $(this).closest('.modal-footer').prev('form');
-                form.submit();
-            });
+        function showDecline(taskId) {
+            $('#Decline_' + taskId).modal('show');
+        }
+
+        function confirmDecline(taskId) {
+            $('#Decline_' + taskId).modal('hide');
+            var form = $('#declineForm_' + taskId);
+            form.submit();
+        }
+
+        function cancelDecline(taskId) {
+            $('#Decline_' + taskId).modal('hide');
+        }
     </script>
 }

@@ -138,8 +138,7 @@
 <table class="table table-hover table-responsive-sm table-sm">
     <thead>
         <tr>
-            <th class="text-center text-uppercase">Client</th>
-            <th class="text-center text-uppercase">Site</th>
+            <th class="text-center text-uppercase">Client/Site</th>
             <th class="text-center text-uppercase">SOM/OM</th>
             <th class="text-center text-uppercase">SC/TK</th>
             <th class="text-center text-uppercase">Details</th>
@@ -149,8 +148,7 @@
         @foreach (System.Data.DataRow dr in ViewBag.Sitelist.Rows)
         {
             <tr class="row-click" onclick="toggleRows(this)">
-                <td class="text-center text-nowrap">@dr["Client"].ToString()</td>
-                <td class="text-center text-nowrap">@dr["Site"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["Client"].ToString() @dr["Site"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["SOM"].ToString()@dr["OM"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["SC"].ToString()@dr["TK"].ToString()</td>
                 <td class="text-center text-nowrap">         
