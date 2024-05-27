@@ -113,7 +113,18 @@ namespace pcg.Controllers
 
             if (session != null)
             {
-                return RedirectToAction("Index", session);
+                if (session == "SAdmin")
+                {                   
+                    return RedirectToAction("Index", "Admin");
+                }
+                if (session == "SUser")
+                {
+                    return RedirectToAction("Index", "User");
+                }
+                else 
+                {
+                    return RedirectToAction("Index", session);
+                }
             }
 
             return View();

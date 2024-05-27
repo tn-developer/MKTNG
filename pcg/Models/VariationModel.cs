@@ -34,6 +34,7 @@ namespace pcg.Models
         public string AssignId { get; set; }
         public string Task { get; set; }
         public string Remarks { get; set; }
+        public string Status { get; set; }
         public string Circulation { get; set; }
         public string Description { get; set; }
         public string Descquery { get; set; }

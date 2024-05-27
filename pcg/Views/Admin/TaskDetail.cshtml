@@ -8,7 +8,11 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
 </head>
-<h1 style="text-align:center">Task Details</h1>
+<h3 style="text-align:center">Task Details</h3>
+@foreach (System.Data.DataRow dr in ViewBag.Sitename.Rows)
+{
+    <h6 style="text-align:center">@dr["Client"].ToString() @dr["Site"].ToString()</h6>
+}
 <table class="table table-hover table-responsive-sm table-sm">
     <thead>
         <tr>
@@ -17,8 +21,8 @@
             <th class="text-center text-uppercase">Remarks</th> 
             <th class="text-center text-uppercase">Description</th>
             <th class="text-center text-uppercase">Added By</th>
-            <th class="text-center text-uppercase">Date Forwarded</th>
-            <th class="text-center text-uppercase">Date Received</th>
+            <th class="text-center text-uppercase">Date Start</th>
+            <th class="text-center text-uppercase">Date Completed</th>
             <th class="text-center text-uppercase">Assignee</th>
             <th class="text-center text-uppercase">Status</th>
         </tr>
@@ -32,8 +36,8 @@
                 <td class="text-center text-nowrap">@dr["Remarks"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["Description"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["AddedBy"].ToString()</td>
-                <td class="text-center text-nowrap">@dr["DateFwd"].ToString()</td>
-                <td class="text-center text-nowrap">@dr["DateRcv"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["DateStart"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["DateClr"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["Name"].ToString()</td>
                 @if (dr["Status"].ToString() == "Approved")
                 {
@@ -41,11 +45,15 @@
                 }
                 else if (dr["Status"].ToString() == "Waiting" || dr["Status"].ToString() == "Pending")
                 {
-                    <td class="text-center text-nowrap" style="color: purple; font-weight: bold">Pending</td>
+                    <td class="text-center text-nowrap" style="color: orangered; font-weight: bold">Pending</td>
                 }
                 else if (dr["Status"].ToString() == "Complete")
                 {
                     <td class="text-center text-nowrap" style="color: green; font-weight: bold">Completed!</td>
+                }
+                else if (dr["Status"].ToString() == "Declined")
+                {
+                    <td class="text-center text-nowrap" style="color: darkred; font-weight: bold">Declined!</td>
                 }
                 else
                 {

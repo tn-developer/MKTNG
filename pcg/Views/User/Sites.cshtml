@@ -83,16 +83,7 @@
                                                     <option value="Schedule">Schedule</option>
                                                     <option value="Finishing">Finishing</option>
                                                 </select>
-                                            </div>
-                                            <div class="form-group">
-                                                    <label asp-for="AssignId" class="control-label">Assign To</label>
-                                                    <select asp-for="AssignId" class="form-control">
-                                                        @foreach (System.Data.DataRow udr in ViewBag.Userlist.Rows)
-                                                        {
-                                                        <option value="@udr["Id"].ToString()">@udr["Name"].ToString(): @udr["Position"].ToString()</option>
-                                                        }
-                                                    </select>
-                                            </div>
+                                            </div>                                            
                                             <div class="modal-footer">
                                                 <input type="hidden" asp-for="SiteReqId" value="@dr["SiteId"].ToString()" />
                                                 <button type="button" class="btn btn-primary" onclick="confirmAddTask('@dr["SiteId"].ToString()')">Confirm</button>

@@ -15,6 +15,8 @@ using System.Drawing;
 using System.Diagnostics;
 using System.ComponentModel;
 using System.Linq;
+using Microsoft.EntityFrameworkCore.Query.SqlExpressions;
+
 
 namespace pcg.Controllers
 {
@@ -52,7 +54,8 @@ namespace pcg.Controllers
 
             cmd = new SqlCommand("WITH LatestDateStart AS " +
                 "(SELECT MAX(DateStart) AS MaxDateStart " +
-                "FROM TaskLog) " +
+                "FROM TaskLog " +
+                "WHERE Status != 'Pre-approve' AND Status != 'Pre-request') " +
                 "SELECT l.LogId, l.TaskId, l.AssignId, l.Status, l.DateStart, l.DateFwd, l.DateRcv, l.DateClr, " +
                 "t.Task, t.Remarks, t.Description, " +
                 "t.SiteReqId, t.AddedBy, s.Client, s.Site, u.Name, u.Position " +
@@ -70,7 +73,8 @@ namespace pcg.Controllers
 
             cmd = new SqlCommand("WITH LatestDateFwd AS " +
                 "(SELECT MAX(DateFwd) AS MaxDateFwd " +
-                "FROM TaskLog) " +
+                "FROM TaskLog " +
+                "WHERE Status != 'Pre-approve' AND Status != 'Pre-request') " +
                 "SELECT l.LogId, l.TaskId, l.AssignId, l.Status, l.DateStart, l.DateFwd, l.DateRcv, l.DateClr, " +
                 "t.Task, t.Remarks, t.Description, " +
                 "t.SiteReqId, t.AddedBy, s.Client, s.Site, u.Name, u.Position " +
@@ -88,7 +92,8 @@ namespace pcg.Controllers
 
             cmd = new SqlCommand("WITH LatestDateRcv AS " +
                 "(SELECT MAX(DateRcv) AS MaxDateRcv " +
-                "FROM TaskLog) " +
+                "FROM TaskLog " +
+                "WHERE Status != 'Pre-approve' AND Status != 'Pre-request') " +
                 "SELECT l.LogId, l.TaskId, l.AssignId, l.Status, l.DateStart, l.DateFwd, l.DateRcv, l.DateClr, " +
                 "t.Task, t.Remarks, t.Description, " +
                 "t.SiteReqId, t.AddedBy, s.Client, s.Site, u.Name, u.Position " +
@@ -556,6 +561,14 @@ namespace pcg.Controllers
 
             ViewBag.Tasklog = task.Tables[0];
 
+            cmd = new SqlCommand("SELECT Client, Site FROM Sites WHERE SiteId = '" + s.SiteId + "'", con);
+
+            DataSet site = new DataSet();
+            SqlDataAdapter sites = new SqlDataAdapter(cmd);
+            sites.Fill(site, "sitelist");
+
+            ViewBag.Sitename = site.Tables[0];
+
             if (con.State == ConnectionState.Open)
             {
                 con.Close();
@@ -760,6 +773,14 @@ namespace pcg.Controllers
                 tasks.Fill(task, "slist");
 
                 ViewBag.Tasklog = task.Tables[0];
+
+                cmd = new SqlCommand("SELECT u.Id, u.Name, u.Position,u.Status, p.UserType FROM Users u LEFT JOIN Positions p ON p.Position = u.Position WHERE p.UserType = 'SAdmin' OR p.UserType = 'Admin' AND u.Status = 'Active'", con);
+
+                DataSet user = new DataSet();
+                SqlDataAdapter users = new SqlDataAdapter(cmd);
+                users.Fill(user, "slist");
+
+                ViewBag.Users = user.Tables[0];
             }
             else
             {
@@ -954,11 +975,22 @@ namespace pcg.Controllers
             
             if (int.Parse(pm.FwdId) == 0) 
             {
-                cmd = new SqlCommand("UPDATE Tasks SET Status = 'Approved', AssignId = '" + pm.AssignId + "',  DateRcv = '" + scdt + "', Process = '" + pm.Code + "', Circulation = '" + count + "' WHERE TaskId = " + pm.TaskId, con);
-                cmd.ExecuteNonQuery();
+                if (pm.Status == "Pre-approve")
+                {
+                    cmd = new SqlCommand("UPDATE Tasks SET Status = 'Approved', AssignId = '" + pm.AssignId + "', DateStart = '" + scdt + "',DateFwd = '" + scdt + "', DateRcv = '" + scdt + "', Process = '" + pm.Code + "', Circulation = '" + count + "' WHERE TaskId = " + pm.TaskId, con);
+                    cmd.ExecuteNonQuery();
 
-                cmd = new SqlCommand("INSERT INTO Tasklog (TaskId, AssignId, DateRcv, Status, Process, Task, Remarks, Circulation) VALUES ('" + pm.TaskId + "', '" + pm.AssignId + "', '" + scdt + "', 'Approved', '" + pm.Code + "', '" + pm.Task + "', '" + pm.Remarks + "', '" + count + "')", con);
-                cmd.ExecuteNonQuery();
+                    cmd = new SqlCommand("INSERT INTO Tasklog (TaskId, AssignId, DateStart, DateFwd, DateRcv, Status, Process, Task, Remarks, Circulation) VALUES ('" + pm.TaskId + "', '" + pm.AssignId + "', '" + scdt + "', '" + scdt + "', '" + scdt + "', 'Approved', '" + pm.Code + "', '" + pm.Task + "', '" + pm.Remarks + "', '" + count + "')", con);
+                    cmd.ExecuteNonQuery();
+                }
+                else 
+                {
+                    cmd = new SqlCommand("UPDATE Tasks SET Status = 'Approved', AssignId = '" + pm.AssignId + "',  DateRcv = '" + scdt + "', Process = '" + pm.Code + "', Circulation = '" + count + "' WHERE TaskId = " + pm.TaskId, con);
+                    cmd.ExecuteNonQuery();
+
+                    cmd = new SqlCommand("INSERT INTO Tasklog (TaskId, AssignId, DateRcv, Status, Process, Task, Remarks, Circulation) VALUES ('" + pm.TaskId + "', '" + pm.AssignId + "', '" + scdt + "', 'Approved', '" + pm.Code + "', '" + pm.Task + "', '" + pm.Remarks + "', '" + count + "')", con);
+                    cmd.ExecuteNonQuery();
+                }
             }
             else  
             {
@@ -1202,7 +1234,7 @@ namespace pcg.Controllers
 
             ViewBag.Coord = coor.Tables[0];
 
-            cmd = new SqlCommand("SELECT * FROM Users WHERE Name != '" + sesname + "' AND Status = 'Active'", con);
+            cmd = new SqlCommand("SELECT u.Id, u.Name, u.Position,u.Status, p.UserType FROM Users u LEFT JOIN Positions p ON p.Position = u.Position WHERE p.UserType = 'SAdmin' OR p.UserType = 'Admin' AND u.Status = 'Active' AND u.Name != '" + sesname + "'", con);
             DataSet user = new DataSet();
             SqlDataAdapter users = new SqlDataAdapter(cmd);
             users.Fill(user, "ulist");
@@ -1358,7 +1390,7 @@ namespace pcg.Controllers
                     " t.DateStart,"  +
                     " t.DateRcv," +
                     " t.Circulation," +
-                    " (SELECT MAX(l1.DateRcv) FROM Tasklog l1 WHERE l1.Process = 'Q1' AND l1.TaskId = t.TaskId) AS DateRcvQ1," +
+                    " (SELECT MAX(l1.DateRcv) FROM Tasklog l1 WHERE l1.Process = 'Q1' AND l1.TaskId = t.TaskId ) AS DateRcvQ1," +
 	                " (SELECT MAX(l2.DateFwd) FROM Tasklog l2 WHERE l2.Process = 'Q2' AND l2.TaskId = t.TaskId) AS DateFwdQ2," +
 	                " (SELECT MAX(l2.DateRcv) FROM Tasklog l2 WHERE l2.Process = 'Q2' AND l2.TaskId = t.TaskId) AS DateRcvQ2," +
 	                " (SELECT MAX(l3.DateFwd) FROM Tasklog l3 WHERE l3.Process = 'Q3' AND l3.TaskId = t.TaskId) AS DateFwdQ3," +
