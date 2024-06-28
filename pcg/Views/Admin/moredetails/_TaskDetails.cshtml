@@ -1,0 +1,79 @@
+﻿@model DetailsModel
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Task Details";
+}
+<div style="text-align: center">
+    <H3>Task</H3>
+</div>
+<div style="display: flex; align-items: flex-start; justify-content: center; border: 1px solid #000">
+    <div style="width: 50%;">
+        <label style="font-weight: bold; margin-bottom: 0px;">Task:</label>
+        <span style="align-self: flex-start; margin-bottom: 0;">@Model.Task</span>
+    </div>
+    <div style="width: 50%;">
+        <label style="font-weight: bold; margin-bottom: 0px;">Task ID:</label>
+        <span style="align-self: flex-start; margin-bottom: 0;">@Model.TaskId</span>
+    </div>
+</div>
+
+<div style="display: flex; align-items: flex-start; justify-content: center; border: 1px solid #000">
+    <div style="width: 50%;">
+        <label style="font-weight: bold; margin-bottom: 0px;">Type:</label>
+        <span style="align-self: flex-start; margin-bottom: 0;">@Model.Type</span>
+    </div>
+    <div style="width: 50%;">
+        <label style="font-weight: bold; margin-bottom: 0px;">Description:</label>
+        <span style="align-self: flex-start; margin-bottom: 0;">@Model.Description</span>
+    </div>
+</div>
+
+<div style="display: flex; align-items: flex-start; justify-content: center; border: 1px solid #000">
+    <div style="width: 50%;">
+        <label style="font-weight: bold; margin-bottom: 0px;">Assignee:</label>
+        @if (Model.AssignId != null || Model.AssignId == "")
+        {
+            <span style="align-self: flex-start; margin-bottom: 0;">@Model.AssignId</span>
+        }
+        else
+        {
+            <span style="align-self: flex-start; margin-bottom: 0;">@Model.ForwardId</span>
+        }
+    </div>
+    <div style="width: 50%;">
+        <label style="font-weight: bold; margin-bottom: 0px;"></label>
+        <span style="align-self: flex-start; margin-bottom: 0;"></span>
+    </div>
+</div>
+
+<div style="text-align: center">
+    <H3>Site</H3>
+</div>
+
+<div style="display: flex; align-items: flex-start; justify-content: center; border: 1px solid #000">
+    <div style="width: 50%; ">
+        <label style="font-weight: bold; margin-bottom: 0px;">Site:</label>
+        <span style="align-self: flex-start; margin-bottom: 0;">@Model.Site</span>
+    </div>
+    <div style="width: 50%;">
+        <label style="font-weight: bold; margin-bottom: 0px;">Task ID:</label>
+        <span style="align-self: flex-start; margin-bottom: 0;">@Model.SiteId</span>
+    </div>
+</div>
+
+<div style="display: flex; align-items: flex-start; justify-content: center; border: 1px solid #000">
+    <div style="width: 50%;">
+        <label style="font-weight: bold; margin-bottom: 0px;">Added By:</label>
+        <span style="align-self: flex-start; margin-bottom: 0;">@Model.AddedBy</span>
+    </div>
+    <div style="width: 50%;">
+        <label style="font-weight: bold; margin-bottom: 0px;"></label>
+        <span style="align-self: flex-start; margin-bottom: 0;"></span>
+    </div>
+</div>
+
+<div style="text-align: center">
+    <H3>Details</H3>
+</div>
+<p>@Model.Details</p>

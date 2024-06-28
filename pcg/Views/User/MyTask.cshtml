@@ -33,12 +33,12 @@
                 {
                     int cir = (int)dr["Circulation"] + 1;
                     <td class="text-center text-nowrap" style="font-weight: bold;">
-                        @dr["Task"].ToString() @dr["Remarks"].ToString() @dr["Description"].ToString() v@(cir)
+                        @dr["Task"].ToString() @dr["Description"].ToString() v@(cir)
                     </td>
                 }
                 else
                 {
-                    <td class="text-center text-nowrap" style="font-weight: bold;">@dr["Task"].ToString() @dr["Remarks"].ToString() @dr["Description"].ToString()</td>
+                    <td class="text-center text-nowrap" style="font-weight: bold;">@dr["Task"].ToString() @dr["Description"].ToString()</td>
                 }
                 <td class="text-center text-nowrap">@dr["Client"].ToString() @dr["Site"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["AddedBy"].ToString()</td>
@@ -62,8 +62,8 @@
                                                 <input asp-for="Task" class="form-control" value="@dr["Task"].ToString()" placeholder="@dr["Task"].ToString()" />
                                             </div>
                                             <div class="form-group">
-                                                <label asp-for="Remarks" class="control-label">Change Remarks (Optional)</label>
-                                                <input asp-for="Remarks" class="form-control" value="@dr["Remarks"].ToString()" placeholder="@dr["Remarks"].ToString()" />
+                                                <label asp-for="Details" class="control-label">Change Details (Optional)</label>
+                                                <input asp-for="Details" class="form-control" value="@dr["Details"].ToString()" placeholder="@dr["Details"].ToString()" />
                                             </div>
                                             <div class="form-group">
                                                 <label asp-for="Code" class="control-label">Process</label>
@@ -87,7 +87,7 @@
                                         <div class="modal-footer">
                                             <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()" />
                                             <input type="hidden" asp-for="Task" value="@dr["Task"].ToString()" />
-                                            <input type="hidden" asp-for="Remarks" value="@dr["Remarks"].ToString()" />
+                                            <input type="hidden" asp-for="Details" value="@dr["Details"].ToString()" />
                                             <button type="button" class="btn btn-outline-warning" onclick="confirmRevise('@dr["TaskId"].ToString()')">Confirm</button>
                                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="closeRevise('@dr["TaskId"].ToString()')">Close</button>
                                         </div>
@@ -144,7 +144,7 @@
                                                     <tbody>
                                                         <tr>
                                                             <td class="text-center text-nowrap">@dr["TaskId"].ToString()</td>
-                                                            <td class="text-center text-nowrap">@dr["Task"].ToString() @dr["Remarks"].ToString() @dr["Description"].ToString()</td>
+                                                            <td class="text-center text-nowrap">@dr["Task"].ToString() @dr["Description"].ToString()</td>
                                                         </tr>
                                                     </tbody>
                                                 </table>
@@ -154,8 +154,8 @@
                                                 <input asp-for="Task" class="form-control" value="@dr["Task"].ToString()" placeholder="@dr["Task"].ToString()" />
                                             </div>
                                             <div class="form-group">
-                                                <label asp-for="Remarks" class="control-label">Change Remarks (Optional)</label>
-                                                <input asp-for="Remarks" class="form-control" value="@dr["Remarks"].ToString()" placeholder="@dr["Remarks"].ToString()" />
+                                                <label asp-for="Details" class="control-label">Change Details (Optional)</label>
+                                                <textarea asp-for="Details" class="form-control" value="@dr["Details"].ToString()" placeholder="@dr["Details"].ToString()"></textarea>
                                             </div>
 
                                             <div class="form-group" id="code">
@@ -195,10 +195,29 @@
         }
     </tbody>
 </table>
+
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Task Info</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- _TaskDetails -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.7/umd/popper.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             $(document).ready(function () {
@@ -275,5 +294,28 @@
         function closeClr(taskId) {
             $('#Clr_' + taskId).modal('hide');
         }
+
+        $(document).ready(function () {
+            $('table tbody tr').on('click', function () {
+                var taskId = $(this).data('taskid');
+                if (!taskId) {
+                    alert('Task ID is missing.');
+                    return;
+                }
+                var url = '/Admin/TaskDetails?taskId=' + encodeURIComponent(taskId);
+
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    success: function (data) {
+                        $('#detailsModal .modal-body').html(data);
+                        $('#detailsModal').modal('show');
+                    },
+                    error: function () {
+                        alert('Failed to load task details.');
+                    }
+                });
+            });
+        });
     </script>
 }

@@ -5,8 +5,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - pcg</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>    
 </head>
 <body>
     <header class="header-yellow-bg">
@@ -24,8 +23,9 @@
                             <ul class="dropdown-menu dropdown-menu-right">
                                 <li><a class="dropdown-item" asp-controller="Admin" asp-action="MyTask">My Task</a></li>
                                 <li><a class="dropdown-item" asp-controller="Admin" asp-action="Forwarded">Forwarded</a></li>
-                                <li><a class="dropdown-item" asp-controller="Admin" asp-action="Pending">Task Approval</a></li>
-                                <li><a class="dropdown-item" asp-controller="Admin" asp-action="AllTask">All Task</a></li>
+                                <li><a class="dropdown-item" asp-controller="Admin" asp-action="Pending">For Approval</a></li>
+                                <li><a class="dropdown-item" asp-controller="Admin" asp-action="VarTask">Variation Tasks</a></li>
+                                <li><a class="dropdown-item" asp-controller="Admin" asp-action="QueryTask">Query Tasks</a></li>
                                 <li><a class="dropdown-item" asp-controller="Admin" asp-action="History">History</a></li>
                             </ul>
                     </li>
@@ -77,8 +77,13 @@
             var ampm = hours >= 12 ? 'PM' : 'AM';
             hours = hours % 12;
             hours = hours ? hours : 12;
+
             var strTime = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
-            document.getElementById('clock').textContent = strTime;
+
+            var options = { year: 'numeric', month: 'long', day: 'numeric' };
+            var strDate = now.toLocaleDateString(undefined, options);
+
+            document.getElementById('clock').textContent = strDate + ' ' + strTime;
         }
         setInterval(updateClock, 1000);
         updateClock();

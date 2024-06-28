@@ -7,46 +7,63 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap5.min.css">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="~/css/custom.css"/>
 </head>
 <h1 style="text-align:center">Tasks Log</h1>
 <input class="form-control" type="text" id="search" placeholder="Search here" onkeyup="searchTable()">
-<table class="table table-hover table-responsive-sm table-sm">
-    <thead>
-        <tr>
-            <th class="text-center text-uppercase">Log No.</th>
-            <th class="text-center text-uppercase">Task No.</th>
-            <th class="text-center text-uppercase">Assigned/Forwarded</th>
-            <th class="text-center text-uppercase">Added By</th>
-            <th class="text-center text-uppercase">Client/Site</th>
-            <th class="text-center text-uppercase">Status</th>
-            <th class="text-center text-uppercase">Process</th>
-            <th class="text-center text-uppercase">Task/Remarks</th>
-            <th class="text-center text-uppercase">Date Start</th>
-            <th class="text-center text-uppercase">Date Forwarded</th>
-            <th class="text-center text-uppercase">Date Received</th>
-            <th class="text-center text-uppercase">Date Completed</th>         
-        </tr>
-    </thead>
-    <tbody id="myTable" class="viewbag-data">
-        @foreach (System.Data.DataRow dr in ViewBag.Tasklog.Rows)
-        {
-        <tr>
-            <td class="text-center text-nowrap">@dr["LogId"].ToString()</td>
-            <td class="text-center text-nowrap">@dr["TaskId"].ToString()</td>
-            <td class="text-center text-nowrap">@dr["Name"].ToString()</td>
-            <td class="text-center text-nowrap">@dr["AddedBy"].ToString()</td>
-            <td class="text-center text-nowrap">@dr["Client"].ToString() @dr["Site"].ToString()</td>
-            <td class="text-center text-nowrap">@dr["Status"].ToString()</td>
-            <td class="text-center text-nowrap">@dr["Process"].ToString()</td>
-            <td class="text-center text-nowrap">@dr["TR"].ToString()</td>
-            <td class="text-center text-nowrap">@dr["DateStart"].ToString()</td>
-            <td class="text-center text-nowrap">@dr["DateFwd"].ToString()</td>
-            <td class="text-center text-nowrap">@dr["DateRcv"].ToString()</td>
-            <td class="text-center text-nowrap">@dr["DateClr"].ToString()</td>
-        </tr>
-        }
-    </tbody>
-</table>
+<div class="ccard" style="overflow-x: auto; max-width: 100%;">
+    <table class="ctable ctable-hover ctable-responsive-sm ctable-sm" style="width: 100%; white-space: nowrap;">
+        <thead>
+            <tr>
+                <th class="text-center text-uppercase" @*style="border: 2px solid black; border-collapse: collapse;*@">Log No.</th>
+                <th class="text-center text-uppercase" @*style="border: 2px solid black; border-collapse: collapse;*@">Task No.</th>
+                <th class="text-center text-uppercase" @*style="border: 2px solid black; border-collapse: collapse;*@">Assigned/Forwarded</th>
+                <th class="text-center text-uppercase" @*style="border: 2px solid black; border-collapse: collapse;*@">Added By</th>
+                <th class="text-center text-uppercase" @*style="border: 2px solid black; border-collapse: collapse;*@">Client/Site</th>
+                <th class="text-center text-uppercase" @*style="border: 2px solid black; border-collapse: collapse;*@">Status</th>
+                <th class="text-center text-uppercase" @*style="border: 2px solid black; border-collapse: collapse;*@">Process</th>
+                <th class="text-center text-uppercase" @*style="border: 2px solid black; border-collapse: collapse;*@">Task</th>
+                <th class="text-center text-uppercase" @*style="border: 2px solid black; border-collapse: collapse;*@">Date Start</th>
+                <th class="text-center text-uppercase" @*style="border: 2px solid black; border-collapse: collapse;*@">Date Forwarded</th>
+                <th class="text-center text-uppercase" @*style="border: 2px solid black; border-collapse: collapse;*@">Date Received</th>
+                <th class="text-center text-uppercase" @*style="border: 2px solid black; border-collapse: collapse;*@">Date Completed</th>
+            </tr>
+        </thead>
+        <tbody id="myTable" class="viewbag-data">
+            @foreach (System.Data.DataRow dr in ViewBag.Tasklog.Rows)
+            {
+                <tr>
+                    <td class="text-center text-nowrap">@dr["LogId"].ToString()</td>
+                    <td class="text-center text-nowrap">@dr["TaskId"].ToString()</td>
+                    <td class="text-center text-nowrap" style="font-weight: bold;">@dr["Name"].ToString()</td>
+                    <td class="text-center text-nowrap">@dr["AddedBy"].ToString()</td>
+                    <td class="text-center text-nowrap" style="font-weight: bold;">@dr["Client"].ToString() @dr["Site"].ToString()</td>
+                    <td class="text-center text-nowrap">@dr["Status"].ToString()</td>
+                    <td class="text-center text-nowrap" style="font-weight: bold;">@dr["Process"].ToString()</td>
+                    <td class="text-center text-nowrap">@dr["Task"].ToString()</td>
+                    <td class="text-center text-nowrap">@dr["DateStart"].ToString()</td>
+                    <td class="text-center text-nowrap">@dr["DateFwd"].ToString()</td>
+                    <td class="text-center text-nowrap">@dr["DateRcv"].ToString()</td>
+                    <td class="text-center text-nowrap">@dr["DateClr"].ToString()</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<nav>
+    <ul id="numbers" class="cpagination">
+        <li id="pageNumbers">
+        </li>
+    </ul>
+
+</nav> 
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js"></script>
 <script>
     function searchTable() {
         var input, filter, table, tr, td, i, txtValue;
@@ -56,6 +73,7 @@
         tr = table.getElementsByTagName("tr");
 
         for (i = 0; i < tr.length; i++) {
+            tr[i].style.display = "none";
             td = tr[i].getElementsByTagName("td");
             for (var j = 0; j < td.length; j++) {
                 if (td[j]) {
@@ -63,11 +81,87 @@
                     if (txtValue.toUpperCase().indexOf(filter) > -1) {
                         tr[i].style.display = "";
                         break;
-                    } else {
-                        tr[i].style.display = "none";
                     }
                 }
             }
         }
+        paginate();
     }
+
+    function paginate() {
+        const rowsPerPage = 10;
+        const rows = $('#myTable tr:visible');
+        const rowsCount = rows.length;
+        const pageCount = Math.ceil(rowsCount / rowsPerPage);
+        const numbers = $('#numbers');
+
+        function generatePageNumbers(currentPage) {
+            numbers.empty();
+            numbers.append('<li class="cpage-item" id="prev-page"><a class="cpage-link" href="#"><</a></li>');
+
+            let startPage = Math.max(1, currentPage - 2);
+            let endPage = Math.min(pageCount, currentPage + 2);
+
+            if (currentPage <= 3) {
+                endPage = Math.min(5, pageCount);
+            } else if (currentPage >= pageCount - 2) {
+                startPage = Math.max(pageCount - 4, 1);
+            }
+
+            for (let i = startPage; i <= endPage; i++) {
+                numbers.append(`<li class="cpage-item"><a class="cpage-link" href="#">${i}</a></li>`);
+            }
+
+            numbers.append('<li class="cpage-item" id="next-page"><a class="cpage-link" href="#">></a></li>');
+
+            togglePaginationButtons(currentPage, pageCount);
+        }
+
+        function displayRows(index, rows) {
+            const start = (index - 1) * rowsPerPage;
+            const end = start + rowsPerPage;
+            rows.hide();
+            rows.slice(start, end).show();
+
+            rows.css('border-bottom', 'none');
+            rows.slice(start, end).last().css('border-bottom', '1px solid black');
+        }
+
+        function togglePaginationButtons(currentPage, pageCount) {
+            $('#prev-page').toggleClass('disabled', currentPage === 1);
+            $('#next-page').toggleClass('disabled', currentPage === pageCount);
+        }
+
+        numbers.off('click').on('click', 'li.cpage-item a', function (e) {
+            e.preventDefault();
+            let pageNumber = $(this).text();
+            let currentPage = parseInt($('#numbers li.active a').text());
+
+            if (pageNumber === '>') {
+                pageNumber = currentPage + 1;
+            } else if (pageNumber === '<') {
+                pageNumber = currentPage - 1;
+            } else {
+                pageNumber = parseInt(pageNumber);
+            }
+
+            if (pageNumber >= 1 && pageNumber <= pageCount) {
+                displayRows(pageNumber, rows);
+                generatePageNumbers(pageNumber);
+                $('#numbers li').removeClass('active');
+                $('#numbers li a').filter(function () {
+                    return $(this).text() == pageNumber;
+                }).parent().addClass('active');
+            }
+        });
+
+        generatePageNumbers(1);
+        displayRows(1, rows);
+        $('#numbers li').eq(1).addClass('active');
+    }
+
+    window.onload = function () {
+        paginate();
+    };
+
 </script>

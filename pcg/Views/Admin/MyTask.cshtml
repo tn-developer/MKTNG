@@ -9,9 +9,11 @@
     <meta http-equiv="Expires" content="0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap5.min.css">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/custom.css" />
 </head>
 <h1 style="text-align:center">My Task</h1>
-<table class="table table-hover table-responsive-sm table-sm">
+<div class="ccard" style="overflow-x: auto; max-width: 100%; border: 1px solid darkgray; border-collapse: collapse;">
+    <table class="ctable ctable-hover ctable-responsive-sm ctable-sm" style="width: 100%; white-space: nowrap;">
     <thead>
         <tr>
             <th class="text-center text-uppercase">Task No.</th>
@@ -27,24 +29,24 @@
     <tbody id="myTable">
         @foreach (System.Data.DataRow dr in ViewBag.Tasklog.Rows)
         {
-            <tr data-taskid="@dr["TaskId"].ToString()">
+                <tr id="row_@dr["TaskId"]" data-taskid="@dr["TaskId"].ToString()">
                 <td class="text-center text-nowrap">@dr["TaskId"].ToString()</td>
                 @if ((int)dr["Circulation"] >= 1)
                 {
                     int cir = (int)dr["Circulation"] + 1;
                     <td class="text-center text-nowrap" style="font-weight: bold;">
-                        @dr["Task"].ToString() @dr["Remarks"].ToString() @dr["Description"].ToString() v@(cir)
+                            @dr["Task"].ToString() @dr["Description"].ToString() v@(cir)
                     </td>
                 }
                 else
                 {
-                    <td class="text-center text-nowrap" style="font-weight: bold;">@dr["Task"].ToString() @dr["Remarks"].ToString() @dr["Description"].ToString()</td>
+                        <td class="text-center text-nowrap" style="font-weight: bold;">@dr["Task"].ToString() @dr["Description"].ToString()</td>
                 }
-                <td class="text-center text-nowrap">@dr["Client"].ToString() @dr["Site"].ToString()</td>
-                <td class="text-center text-nowrap">@dr["AddedBy"].ToString()</td>
-                <td class="text-center text-nowrap">@dr["DateFwd"].ToString()</td>
-                <td class="text-center text-nowrap">@dr["DateRcv"].ToString()</td>
-                <td class="text-center text-nowrap">@dr["Name"].ToString()</td>
+                <td class="text-center text-nowrap show-details">@dr["Client"].ToString() @dr["Site"].ToString()</td>
+                <td class="text-center text-nowrap show-details">@dr["AddedBy"].ToString()</td>
+                <td class="text-center text-nowrap show-details">@dr["DateFwd"].ToString()</td>
+                <td class="text-center text-nowrap show-details">@dr["DateRcv"].ToString()</td>
+                <td class="text-center text-nowrap show-details">@dr["Name"].ToString()</td>
                 <td>
                     @if (dr["Process"].ToString() == "Q7")
                     {
@@ -62,8 +64,8 @@
                                                 <input id="revtask_@dr["TaskId"].ToString()" asp-for="Task" class="form-control" value="@dr["Task"].ToString()" placeholder="@dr["Task"].ToString()" />
                                             </div>
                                             <div class="form-group">
-                                                <label asp-for="Remarks" class="control-label">Change Remarks (Optional)</label>
-                                                <input id="revremarks_@dr["TaskId"].ToString()" asp-for="Remarks" class="form-control" value="@dr["Remarks"].ToString()" placeholder="@dr["Remarks"].ToString()" />
+                                                    <label asp-for="Details" class="control-label">Change Details (Optional)</label>
+                                                    <textarea id="revdetails_@dr["TaskId"].ToString()" asp-for="Details" class="form-control" value="@dr["Details"].ToString()" placeholder="@dr["Details"].ToString()"></textarea>
                                             </div>
                                             <div class="form-select" id="code">
                                                 <label for="codeOption_@dr["TaskId"].ToString()" asp-for="Code" class="control-label">Process</label>
@@ -87,7 +89,7 @@
                                         <div class="modal-footer">
                                             <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()"/>
                                             <input type="hidden" id="revtaskval_@dr["TaskId"].ToString()" value="@dr["Task"].ToString()" />
-                                            <input type="hidden" id="revremarksval_@dr["TaskId"].ToString()" value="@dr["Remarks"].ToString()" />
+                                            <input type="hidden" id="revdetailsval_@dr["TaskId"].ToString()" value="@dr["Details"].ToString()" />
                                             <button type="button" class="btn btn-outline-primary" onclick="confirmRevise('@dr["TaskId"].ToString()')">Confirm</button>
                                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="closeRevise('@dr["TaskId"].ToString()')">Close</button>
                                         </div>
@@ -110,7 +112,7 @@
                                         <div class="modal-footer">
                                             <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()"/>
                                             <input type="hidden" asp-for="Task" value="@dr["Task"].ToString()"/>
-                                            <input type="hidden" asp-for="Remarks" value="@dr["Remarks"].ToString()"/>
+                                            <input type="hidden" asp-for="Details" value="@dr["Details"].ToString()" />
                                             <input type="hidden" asp-for="AssignId" value="@ViewData["SessionId"]" />
                                             <button type="button" class="btn btn-outline-info" onclick="confirmClr('@dr["TaskId"].ToString()')">Confirm</button>
                                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="closeClr('@dr["TaskId"].ToString()')">Close</button>
@@ -147,7 +149,7 @@
                                                 <tbody>
                                                     <tr>
                                                         <td class="text-center text-nowrap">@dr["TaskId"].ToString()</td>
-                                                            <td class="text-center text-nowrap">@dr["Task"].ToString() <br/> @dr["Remarks"].ToString() <br/> @dr["Description"].ToString()</td>
+                                                        <td class="text-center text-nowrap">@dr["Task"].ToString() <br /> @dr["Description"].ToString()</td>
                                                     </tr>
                                                 </tbody>
                                             </table>
@@ -157,8 +159,8 @@
                                                 <input id="fwdtask_@dr["TaskId"].ToString()" asp-for="Task" class="form-control" value="@dr["Task"].ToString()" placeholder="@dr["Task"].ToString()" />
                                             </div>
                                             <div class="form-group">
-                                                <label asp-for="Remarks" class="control-label">Change Remarks (Optional)</label>
-                                                <input id="fwdremarks_@dr["TaskId"].ToString()" asp-for="Remarks" class="form-control" value="@dr["Remarks"].ToString()" placeholder="@dr["Remarks"].ToString()" />
+                                                    <label asp-for="Details" class="control-label">Change Details (Optional)</label>
+                                                    <textarea id="fwdDetails_@dr["TaskId"].ToString()" asp-for="Details" class="form-control" value="@dr["Details"].ToString()" placeholder="@dr["Details"].ToString()"></textarea>
                                             </div>
                                         
                                         <div class="form-select" id="code">
@@ -184,7 +186,7 @@
                                             <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()"/>
                                             <input type="hidden" asp-for="AssignId" value="@ViewData["SessionId"]"/>
                                             <input type="hidden" id="fwdtaskval_@dr["TaskId"].ToString()" value="@dr["Task"].ToString()" />
-                                            <input type="hidden" id="fwdremarksval_@dr["TaskId"].ToString()" value="@dr["Remarks"].ToString()" />
+                                            <input type="hidden" id="fwddetalsval_@dr["TaskId"].ToString()" value="@dr["Details"].ToString()" />
                                             <button type="button" class="btn btn-outline-primary" onclick="confirmFwd('@dr["TaskId"].ToString()')">Confirm</button>
                                             <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="closeFwd('@dr["TaskId"].ToString()')">Close</button>
                                         </div>
@@ -199,12 +201,14 @@
                     }
                     </tr>     
         }
-    </tbody>
+    </tbody> 
 </table>
+</div>
 @section scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.7/umd/popper.min.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             $(document).ready(function () {
@@ -245,15 +249,15 @@
 
         function confirmRevise(taskId) {
             var revtask = document.getElementById("revtask_" + taskId);
-            var revremarks = document.getElementById("revremarks_" + taskId);
+            var revdetails = document.getElementById("revdetails_" + taskId);
             var revtaskval = document.getElementById("revtaskval_" + taskId).value;
-            var revremarksval = document.getElementById("revremarksval_" + taskId).value;
+            var revdetailsval = document.getElementById("revdetailval_" + taskId).value;
 
             if (revtask.value.trim() === "") {
                 revtask.value = revtaskval;
             }
-            if (revremarks.value.trim() === "") {
-                revremarks.value = revremarksval;
+            if (revdetails.value.trim() === "") {
+                revdetails.value = revdetailsval;
             }
 
             $('#Revise_' + taskId).modal('hide');
@@ -271,15 +275,15 @@
 
         function confirmFwd(taskId) {
             var fwdtask = document.getElementById("fwdtask_" + taskId);
-            var fwdremarks = document.getElementById("fwdremarks_" + taskId);
+            var fwddetails = document.getElementById("fwddetails_" + taskId);
             var fwdtaskval = document.getElementById("fwdtaskval_" + taskId).value;
-            var fwdremarksval = document.getElementById("fwdremarksval_" + taskId).value;
+            var fwddetailsval = document.getElementById("fwddetailsval_" + taskId).value;
 
             if (fwdtask.value.trim() === "") {
                 fwdtask.value = fwdtaskval;
             }
-            if (fwdremarks.value.trim() === "") {
-                fwdremarks.value = fwdremarksval;
+            if (fwddetails.value.trim() === "") {
+                fwddetails.value = fwddetailsval;
             }
 
             var form = $('#Fwd_' + taskId).find('form');
@@ -304,5 +308,104 @@
         function closeClr(taskId) {
             $('#Clr_' + taskId).modal('hide');
         }
+
+        function paginate() {
+            const rowsPerPage = 10;
+            const rows = $('#myTable tr:visible');
+            const rowsCount = rows.length;
+            const pageCount = Math.ceil(rowsCount / rowsPerPage);
+            const numbers = $('#numbers');
+
+            function generatePageNumbers(currentPage) {
+                numbers.empty();
+                numbers.append('<li class="page-item" id="prev-page"><a class="page-link" href="#">Previous</a></li>');
+
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(pageCount, currentPage + 2);
+
+                if (currentPage <= 3) {
+                    endPage = Math.min(5, pageCount);
+                } else if (currentPage >= pageCount - 2) {
+                    startPage = Math.max(pageCount - 4, 1);
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    numbers.append('<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>');
+                }
+
+                numbers.append('<li class="page-item" id="next-page"><a class="page-link" href="#">Next</a></li>');
+                togglePaginationButtons(currentPage, pageCount);
+            }
+
+            function displayRows(index, rows) {
+                const start = (index - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                rows.hide();
+                rows.slice(start, end).show();
+
+                rows.css('border-bottom', 'none');
+                rows.slice(start, end).last().css('border-bottom', '1px solid black');
+            }
+
+            function togglePaginationButtons(currentPage, pageCount) {
+                $('#prev-page').toggleClass('disabled', currentPage === 1);
+                $('#next-page').toggleClass('disabled', currentPage === pageCount);
+            }
+
+            numbers.on('click', 'li.page-item a', function (e) {
+                e.preventDefault();
+                let pageNumber = $(this).text();
+                let currentPage = parseInt($('#numbers li.cactive a').text());
+
+                if (pageNumber === 'Next') {
+                    pageNumber = currentPage + 1;
+                } else if (pageNumber === 'Previous') {
+                    pageNumber = currentPage - 1;
+                } else {
+                    pageNumber = parseInt(pageNumber);
+                }
+
+                if (pageNumber >= 1 && pageNumber <= pageCount) {
+                    displayRows(pageNumber, rows);
+                    generatePageNumbers(pageNumber);
+                    $('#numbers li').removeClass('cactive');
+                    $('#numbers li a').filter(function () {
+                        return $(this).text() == pageNumber;
+                    }).parent().addClass('cactive');
+                }
+            });
+
+            generatePageNumbers(1);
+            displayRows(1, rows);
+            $('#numbers li').eq(1).addClass('cactive');
+        }
+
+        $(document).ready(function () {
+            $(document).ready(function () {
+                console.log("Document ready function executed.");
+                $('table tbody').on('click', 'tr[id^="row_"] .show-details', function () {
+                    var $tr = $(this).closest('tr[id^="row_"]');
+                    var taskId = $tr.data('taskid');
+                    if (!taskId) {
+                        alert('Task ID is missing.');
+                        return;
+                    }
+                    var url = '/Admin/TaskDetails?taskId=' + encodeURIComponent(taskId);
+
+                    $.ajax({
+                        url: url,
+                        type: 'GET',
+                        success: function (data) {
+                            $('#detailsModal .modal-body').html(data);
+                            $('#detailsModal').modal('show');
+                        },
+                        error: function () {
+                            alert('Failed to load task details.');
+                        }
+                    });
+                });
+
+            paginate();
+        });
     </script>
 }

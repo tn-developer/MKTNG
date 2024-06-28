@@ -1,0 +1,206 @@
+﻿@model pcg.Models.VariationModel
+
+@{
+    ViewData["Title"] = "Variation Task";
+}
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/custom.css" />
+</head>
+<body>
+    <h1 style="text-align:center">Variation Task</h1>
+    <input class="form-control" type="text" id="search" placeholder="Search here" onkeyup="searchTable()">
+    <div class="ccard" style="overflow-x: auto; max-width: 100%; border: 1px solid darkgray; border-collapse: collapse;">
+        <table class="ctable ctable-hover ctable-responsive-sm ctable-sm" style="width: 100%; white-space: nowrap;">
+            <thead>
+                <tr>
+                    <th class="text-center text-uppercase">Task No.</th>
+                    <th class="text-center text-uppercase">Task Info</th>
+                    <th class="text-center text-uppercase">Assignee</th>
+                    <th class="text-center text-uppercase">Request Date</th>
+                    <th class="text-center text-uppercase">Forward To Cad</th>
+                    <th class="text-center text-uppercase">For Quotation</th>
+                    <th class="text-center text-uppercase">Forwarded to Costing</th>
+                    <th class="text-center text-uppercase">Costing</th>
+                    <th class="text-center text-uppercase">Approval</th>
+                    <th class="text-center text-uppercase">Send to Client</th>
+                    <th class="text-center text-uppercase">Client Approval</th>
+                    <th class="text-center text-uppercase">Circulation</th>
+                </tr>
+            </thead>
+            <tbody id="myTable" class="viewbag-data">
+                @foreach (System.Data.DataRow dr in ViewBag.tlist.Rows)
+                {
+                    <tr data-taskid="@dr["TaskId"]">
+                        <td class="text-center text-nowrap">@dr["TaskId"].ToString()</td>
+                        @if ((int)dr["Circulation"] >= 1)
+                        {
+                            int cir = (int)dr["Circulation"] + 1;
+                            <td class="text-center text-nowrap" style="font-weight: bold;">
+                                @dr["TaskInfo"].ToString() v@(cir)
+                            </td>
+                        }
+                        else
+                        {
+                            <td class="text-center text-nowrap" style="font-weight: bold;">@dr["TaskInfo"].ToString()</td>
+                        }
+                        <td class="text-center text-nowrap">@dr["Name"].ToString()</td>
+                        <td class="text-center text-nowrap">@dr["DateStart"].ToString()</td>
+                        <td class="text-center text-nowrap">@dr["DateRcvQ1"].ToString()</td>
+                        <td class="text-center text-nowrap">@dr["DateRcvQ2"].ToString()</td>
+                        <td class="text-center text-nowrap">@dr["DateRcvQ3"].ToString()</td>
+                        <td class="text-center text-nowrap">@dr["DateRcvQ4"].ToString()</td>
+                        <td class="text-center text-nowrap">@dr["DateRcvQ5"].ToString()</td>
+                        <td class="text-center text-nowrap">@dr["DateRcvQ6"].ToString()</td>
+                        <td class="text-center text-nowrap">@dr["DateFwdQ7"].ToString()</td>
+                        <td class="text-center text-nowrap">@dr["Circulation"].ToString()</td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="detailsModalLabel">Task Info</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- _TaskDetails -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.7/umd/popper.min.js"></script>
+
+    <script>
+        function searchTable() {
+            var input, filter, table, tr, td, i, txtValue;
+            input = document.getElementById("search");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("myTable");
+            tr = table.getElementsByTagName("tr");
+
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td");
+                for (var j = 0; j < td.length; j++) {
+                    if (td[j]) {
+                        txtValue = td[j].textContent || td[j].innerText;
+                        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                            tr[i].style.display = "";
+                            break;
+                        } else {
+                            tr[i].style.display = "none";
+                        }
+                    }
+                }
+            }
+        }
+
+        function paginate() {
+            const rowsPerPage = 10;
+            const rows = $('#myTable tr:visible');
+            const rowsCount = rows.length;
+            const pageCount = Math.ceil(rowsCount / rowsPerPage);
+            const numbers = $('#numbers');
+
+            function generatePageNumbers(currentPage) {
+                numbers.empty();
+                numbers.append('<li class="page-item" id="prev-page"><a class="page-link" href="#">Previous</a></li>');
+
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(pageCount, currentPage + 2);
+
+                if (currentPage <= 3) {
+                    endPage = Math.min(5, pageCount);
+                } else if (currentPage >= pageCount - 2) {
+                    startPage = Math.max(pageCount - 4, 1);
+                }
+
+                for (let i = startPage; i <= endPage; i++) {
+                    numbers.append('<li class="page-item"><a class="page-link" href="#">' + i + '</a></li>');
+                }
+
+                numbers.append('<li class="page-item" id="next-page"><a class="page-link" href="#">Next</a></li>');
+                togglePaginationButtons(currentPage, pageCount);
+            }
+
+            function displayRows(index, rows) {
+                const start = (index - 1) * rowsPerPage;
+                const end = start + rowsPerPage;
+                rows.hide();
+                rows.slice(start, end).show();
+
+                rows.css('border-bottom', 'none');
+                rows.slice(start, end).last().css('border-bottom', '1px solid black');
+            }
+
+            function togglePaginationButtons(currentPage, pageCount) {
+                $('#prev-page').toggleClass('disabled', currentPage === 1);
+                $('#next-page').toggleClass('disabled', currentPage === pageCount);
+            }
+
+            numbers.on('click', 'li.page-item a', function (e) {
+                e.preventDefault();
+                let pageNumber = $(this).text();
+                let currentPage = parseInt($('#numbers li.cactive a').text());
+
+                if (pageNumber === 'Next') {
+                    pageNumber = currentPage + 1;
+                } else if (pageNumber === 'Previous') {
+                    pageNumber = currentPage - 1;
+                } else {
+                    pageNumber = parseInt(pageNumber);
+                }
+
+                if (pageNumber >= 1 && pageNumber <= pageCount) {
+                    displayRows(pageNumber, rows);
+                    generatePageNumbers(pageNumber);
+                    $('#numbers li').removeClass('cactive');
+                    $('#numbers li a').filter(function () {
+                        return $(this).text() == pageNumber;
+                    }).parent().addClass('cactive');
+                }
+            });
+
+            generatePageNumbers(1);
+            displayRows(1, rows);
+            $('#numbers li').eq(1).addClass('cactive');
+        }
+
+        $(document).ready(function () {
+            $('table tbody tr').on('click', function () {
+                var taskId = $(this).data('taskid');
+                if (!taskId) {
+                    alert('Task ID is missing.');
+                    return;
+                }
+                var url = '/Admin/TaskDetails?taskId=' + encodeURIComponent(taskId);
+
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    success: function (data) {
+                        $('#detailsModal .modal-body').html(data);
+                        $('#detailsModal').modal('show');
+                    },
+                    error: function () {
+                        alert('Failed to load task details.');
+                    }
+                });
+            });
+
+            paginate();
+        });
+    </script>
+</body>

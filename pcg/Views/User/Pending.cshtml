@@ -20,7 +20,6 @@
         <tr>
             <th class="text-center text-uppercase">Task No.</th>
             <th class="text-center text-uppercase">Task</th>
-            <th class="text-center text-uppercase">Remarks</th>
             <th class="text-center text-uppercase">Description</th>
             <th class="text-center text-uppercase">Client/Site</th>
             <th class="text-center text-uppercase">Added By</th>
@@ -35,7 +34,6 @@
             <tr>
                 <td class="text-center text-nowrap">@dr["TaskId"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["Task"].ToString()</td>
-                <td class="text-center text-nowrap">@dr["Remarks"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["Description"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["Client"].ToString() @dr["Site"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["AddedBy"].ToString()</td>
@@ -61,7 +59,7 @@
                                             <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()" />
                                             <input type="hidden" asp-for="AssignId" value="@dr["AssignId"].ToString()" />
                                             <input type="hidden" asp-for="Task" value="@dr["Task"].ToString()" />
-                                            <input type="hidden" asp-for="Remarks" value="@dr["Remarks"].ToString()" />
+                                            <input type="hidden" asp-for="Details" value="@dr["Details"].ToString()" />
                                             <input type="hidden" asp-for="Process" value="@dr["Code"].ToString()" />
                                             <button type="button" class="btn btn-primary" onclick="confirmApprove('@dr["TaskId"].ToString()')">Approve</button>
                                         </form>
@@ -88,7 +86,7 @@
                                             <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()" />
                                             <input type="hidden" asp-for="AssignId" value="@dr["AssignId"].ToString()" />
                                             <input type="hidden" asp-for="Task" value="@dr["Task"].ToString()" />
-                                            <input type="hidden" asp-for="Remarks" value="@dr["Remarks"].ToString()" />
+                                            <input type="hidden" asp-for="Details" value="@dr["Details"].ToString()" />
                                             <input type="hidden" asp-for="Process" value="@dr["Code"].ToString()" />
                                         </form>
                                         <button type="button" onclick="cancelDecline('@dr["TaskId"].ToString()')" class="btn btn-secondary" data-dismiss="modal">Cancel</button>

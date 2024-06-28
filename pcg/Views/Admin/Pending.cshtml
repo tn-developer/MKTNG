@@ -1,7 +1,7 @@
 ﻿@model pcg.Models.ProcessModel
 
 @{
-    ViewData["Title"] = "Task Approval";
+    ViewData["Title"] = "For Approval";
 }
 <head>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
@@ -9,14 +9,14 @@
     <meta http-equiv="Expires" content="0">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap5.css">
+    <link rel="stylesheet" href="~/css/custom.css" />
 </head>
-<h1 style="text-align:center">Task Approval</h1>
-<table class="table table-hover table-responsive-sm table-sm">
+<h1 style="text-align:center">For Approval</h1>
+<table class="ctable ctable-hover ctable-responsive-sm ctable-sm">
     <thead>
         <tr>
             <th class="text-center text-uppercase">Task No.</th>
             <th class="text-center text-uppercase">Task</th>
-            <th class="text-center text-uppercase">Remarks</th> 
             <th class="text-center text-uppercase">Description</th>
             <th class="text-center text-uppercase">Client/Site</th>
             <th class="text-center text-uppercase">Added By</th>
@@ -31,7 +31,6 @@
             <tr>
                 <td class="text-center text-nowrap">@dr["TaskID_Tasks"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["Task"].ToString()</td>
-                <td class="text-center text-nowrap">@dr["Remarks"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["Description"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["Client"].ToString() @dr["Site"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["AddedBy"].ToString()</td>
@@ -46,7 +45,7 @@
                             <input type="hidden" asp-for="AssignId" value="@dr["AssignId"].ToString()" />
                             <input type="hidden" asp-for="FwdId" value="@dr["ForwardId"].ToString()" />
                             <input type="hidden" asp-for="Task" value="@dr["Task"].ToString()" />
-                            <input type="hidden" asp-for="Remarks" value="@dr["Remarks"].ToString()" />
+                            <input type="hidden" asp-for="Details" value="@dr["Details"].ToString()" />
                             <input type="hidden" asp-for="Code" value="@dr["Code"].ToString()" />
                             <button type="button" class="btn btn-primary confirm-button">Approve</button>
                         </form>
@@ -55,7 +54,7 @@
                             <input type="hidden" asp-for="AssignId" value="@dr["AssignId"].ToString()" />
                             <input type="hidden" asp-for="FwdId" value="@dr["ForwardId"].ToString()" />
                             <input type="hidden" asp-for="Task" value="@dr["Task"].ToString()" />
-                            <input type="hidden" asp-for="Remarks" value="@dr["Remarks"].ToString()" />
+                            <input type="hidden" asp-for="Details" value="@dr["Details"].ToString()" />
                             <input type="hidden" asp-for="Code" value="@dr["Code"].ToString()" />
                             <button type="button" class="btn btn-danger decline-confirm-button">Decline</button>
                         </form>
@@ -89,7 +88,7 @@
                                             <input type="hidden" asp-for="TaskId" value="@dr["TaskID_Tasks"].ToString()" />
                                             <input type="hidden" asp-for="FwdId" value="@dr["ForwardId"].ToString()" />
                                             <input type="hidden" asp-for="Task" value="@dr["Task"].ToString()" />
-                                            <input type="hidden" asp-for="Remarks" value="@dr["Remarks"].ToString()" />
+                                            <input type="hidden" asp-for="Details" value="@dr["Details"].ToString()" />
                                             <input type="hidden" asp-for="Code" value="@dr["Code"].ToString()" />
                                             <input type="hidden" asp-for="Status" value="@dr["Status"].ToString()" />
                                             <button type="button" class="btn btn-primary confirm-button">Approve</button>
@@ -111,7 +110,6 @@
         }
     </tbody>
 </table>
-
 
 <div class="modal fade" id="confirmModal" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">

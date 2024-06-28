@@ -8,7 +8,7 @@ namespace pcg.Models
         [Required(ErrorMessage = "Task cannot be empty.")]
         public string Task { get; set; }
         public string TaskId { get; set; }
-        public string Remarks { get; set; }
+        public string Details { get; set; }
         [Required(ErrorMessage = "Description cannot be empty.")]
         public string Description { get; set; }
         public string Descquery { get; set; }
@@ -22,6 +22,7 @@ namespace pcg.Models
         public string DateRcv { get; set; }
         public string DateClr { get; set; }
         public string Process { get; set; }
+        public string TaskType { get; set; }
     }
     public class ProcessModel
     {
@@ -33,7 +34,7 @@ namespace pcg.Models
         public string FwdId { get; set; }
         public string AssignId { get; set; }
         public string Task { get; set; }
-        public string Remarks { get; set; }
+        public string Details { get; set; }
         public string Status { get; set; }
         public string Circulation { get; set; }
         public string Description { get; set; }
