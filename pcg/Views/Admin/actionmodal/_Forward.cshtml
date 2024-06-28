@@ -1,0 +1,119 @@
+﻿@model ProcessModel
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Task Details";
+}
+<div style="text-align: center">
+    <H3>Task</H3>
+</div>
+@foreach (System.Data.DataRow dr in ViewBag.Taskfwd.Rows)
+{
+    <div>
+        <form id="fwdform_@dr["TaskId"]" asp-controller="Admin" asp-action="TaskForward" method="post">
+            <div class="modal-body">
+                <div style="display: flex; justify-content: center; width: 100%;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="text-center text-uppercase">Task No.</th>
+                                <th class="text-center text-uppercase">task info</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center text-nowrap">@dr["TaskId"].ToString()</td>
+                                <td class="text-center text-nowrap">@dr["Task"].ToString() <br/> @dr["Description"].ToString()</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="form-group">
+                    <label asp-for="Task" class="control-label">Change Task Name (Optional)</label>
+                    <input id="fwdtask_@dr["TaskId"].ToString()" asp-for="Task" class="form-control" value="@dr["Task"].ToString()" placeholder="@dr["Task"].ToString()" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Details" class="control-label">Change Details (Optional)</label>
+                    <textarea id="fwdDetails_@dr["TaskId"].ToString()" asp-for="Details" class="form-control" value="@dr["Details"].ToString()" placeholder="@dr["Details"].ToString()"></textarea>
+                </div>
+
+                <div class="form-select" id="code">
+                    <label for="fwdcodeOption_@dr["TaskId"].ToString()" asp-for="Code" class="control-label">Process</label>
+                    <select id="fwdcodeOption_@dr["TaskId"].ToString()" asp-for="Code" class="form-control">
+                        @foreach (System.Data.DataRow dar in ViewBag.Process.Rows)
+                        {
+                            <option value="@dar["Code"].ToString()">@dar["Process"].ToString()</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-select" id="assign_@dr["TaskId"].ToString()" style="display: block">
+                    <label for="fwdassignOption_@dr["TaskId"].ToString()" asp-for="FwdId" class="control-label">Select Assignee</label>
+                    <select id="fwdassignOption_@dr["TaskId"].ToString()" asp-for="FwdId" placeholder="Search...">
+                        @foreach (System.Data.DataRow dar in ViewBag.Users.Rows)
+                        {
+                            <option value="@dar["Id"].ToString()">@dar["Name"].ToString(): @dar["Position"].ToString()</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()" />
+                <input type="hidden" asp-for="AssignId" value="@ViewData["SessionId"]" />
+                <input type="hidden" asp-for="SiteSC" value="@dr["SiteSC"].ToString()" />
+                <input type="hidden" asp-for="SiteTK" value="@dr["SiteTK"].ToString()" />
+                <input type="hidden" id="fwdtaskval_@dr["TaskId"].ToString()" value="@dr["Task"].ToString()" />
+                <input type="hidden" id="fwddetailsval_@dr["TaskId"].ToString()" value="@dr["Details"].ToString()" />
+                <button type="button" class="btn btn-outline-primary" data-task-id="@dr["TaskId"].ToString()" id="confirmFwd_@dr["TaskId"].ToString()">Confirm</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </form>
+    </div>
+}
+<script>
+    $(document).ready(function () {
+        function init(taskId) {
+            var $select = $('#fwdassignOption_' + taskId);
+
+            $('#fwdcodeOption_' + taskId).on('change', function () {
+                if ($(this).val() === 'Q7') {
+                    $('#assign_' + taskId).hide();
+                } else {
+                    $('#assign_' + taskId).show();
+                }
+            });
+
+            if ($select.data('selectize')) {
+                $select[0].selectize.destroy();
+            }
+
+            $select.selectize({
+                allowEmptyOption: false,
+                create: false,
+                sortField: 'text'
+            });
+        }
+        $('#FwdModal').on('shown.bs.modal', function (e) {
+            var taskId = $(e.relatedTarget).data('taskid');
+            init(taskId);
+
+            $('#confirmFwd_' + taskId).on('click', function () {
+                var fwdtask = $('#fwdtask_' + taskId);
+                var fwdDetails = $('#fwdDetails_' + taskId);
+                var fwdtaskval = $('#fwdtaskval_' + taskId).val();
+                var fwddetailsval = $('#fwddetailsval_' + taskId).val();
+
+                if (fwdtask.val().trim() === "") {
+                    fwdtask.val(fwdtaskval);
+                }
+                if (fwdDetails.val().trim() === "") {
+                    fwdDetails.val(fwddetailsval);
+                }
+                $('#fwdform_' + taskId).submit();
+            });
+        });
+    });
+
+    function submitForm(formId) {
+        $(formId).submit();
+    }
+</script>

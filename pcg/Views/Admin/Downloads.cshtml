@@ -1,0 +1,59 @@
+﻿@model IEnumerable<pcg.Models.Downloads>
+@{
+    ViewData["Title"] = "File";
+}
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap5.min.css">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/custom.css" />
+</head>
+<div>
+    <h1 style="text-align:center">Files for @ViewBag.Taskid</h1>
+</div>
+<div class="ccard" style="overflow-x: auto; max-width: 100%; border: 1px solid darkgray; border-collapse: collapse;">
+    <table class="ctable ctable-hover ctable-responsive-sm ctable-sm" id="datatable" style="width: 100%; white-space: nowrap;">
+        <thead>
+            <tr>
+                <th class="text-center text-uppercase">File Name</th>
+                <th class="text-center text-uppercase">Upload By</th>
+                <th class="text-center text-uppercase">Date Added</th>
+                <th class="text-center text-uppercase">Task</th>
+                <th class="text-center text-uppercase">Action</th>
+        </thead>
+        <tbody>
+            @if (Model != null)
+            {
+                foreach (var dr in Model)
+                {
+                    <tr>
+                        <td class="text-center text-nowrap">@dr.FileAlias</td>
+                        <td class="text-center text-nowrap">@dr.Name</td>
+                        <td class="text-center text-nowrap">@dr.DateAdded</td>
+                        <td class="text-center text-nowrap">@dr.Task</td>
+                        <td class="text-center text-nowrap">
+                            <a href="@Url.Action("DownloadFile", "Admin", new { fileName = @dr.FileName })" class="btn btn-primary" style="height: 25px; line-height: 12px; margin-right: 3px">Download</a>
+                            <form action="@Url.Action("DeleteFile", "Admin")" method="post" style="display:inline;">
+                                <input type="hidden" name="fileName" value="@dr.FileName" />
+                                <input type="hidden" name="fileId" value="@dr.FileId" />
+                                <input type="hidden" name="taskid" value="@dr.TaskId" />
+                                <button type="submit" class="btn btn-danger" style="height: 25px; line-height: 12px;">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td class="text-center text-nowrap">N/A</td>
+                    <td class="text-center text-nowrap">N/A</td>
+                    <td class="text-center text-nowrap">N/A</td>
+                    <td class="text-center text-nowrap">N/A</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,25 @@
+﻿@model FileModel
+
+<div class="modal-body">
+    <h6>For Task @Model.TaskId</h6>
+
+    <form id="uploadForm" method="post" enctype="multipart/form-data" action="/Admin/UploadFile">
+        <input type="hidden" name="taskid" value="@Model.TaskId" />
+        <div class="d-flex align-items-center">            
+            <input type="file" id="formFile" name="UploadFile" style="display:none" required>
+            <label for="formFile" class="upload-label me-2">
+                <img src="~/images/icons/uploadfile.png" alt="File Icon" id="fileIcon" class="custom-icon">
+            </label>
+            <div class="form-floating flex-grow-1 me-2">
+                <input asp-for="FileAlias" class="form-control" id="FileAlias" placeholder="File Name" />
+            </div>
+        </div>
+        <span class="text-danger">@Html.ValidationMessageFor(m => m.FileAlias)</span>
+        <span class="text-danger">@Html.ValidationMessageFor(m => m.UploadFile)</span>
+        @if (ViewBag.SuccessMessage != null)
+        {
+            <div class="text-success">@ViewBag.SuccessMessage</div>
+        }
+        <button type="submit" class="btn btn-primary btn-block">Upload</button>
+    </form>
+</div>

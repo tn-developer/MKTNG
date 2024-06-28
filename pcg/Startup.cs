@@ -10,7 +10,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using pcg.Models;
-
+using pcg.Formula;
+using System.IO;
 
 namespace pcg
 {
@@ -35,8 +36,13 @@ namespace pcg
             });
 
             var connection = _configuration.GetConnectionString("DefaultConnection");
-            services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(connection));
+            services.AddDbContext<PCGContext>(options => options.UseSqlServer(connection));
+            var uploadPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "PCGFiles");
 
+            // Register FileUploadService as a singleton
+            services.AddSingleton(new FileService(uploadPath));
+
+            // Add other services
             services.AddControllersWithViews();
         }
 

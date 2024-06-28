@@ -1,0 +1,100 @@
+﻿@model ProcessModel
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Task Details";
+}
+<div style="text-align: center">
+    <H3>Task</H3>
+</div>
+@foreach (System.Data.DataRow dr in ViewBag.Taskfwd.Rows)
+{
+    <div>
+        <form id="revform_@dr["TaskId"]" asp-controller="Admin" asp-action="Revise" method="post">
+            <div class="modal-body">
+                <div class="form-group">
+                    <label asp-for="Task" class="control-label">Change Task Name (Optional)</label>
+                    <input id="revtask_@dr["TaskId"].ToString()" asp-for="Task" class="form-control" value="@dr["Task"].ToString()" placeholder="@dr["Task"].ToString()" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Details" class="control-label">Change Details (Optional)</label>
+                    <textarea id="revdetails_@dr["TaskId"].ToString()" asp-for="Details" class="form-control" value="@dr["Details"].ToString()" placeholder="@dr["Details"].ToString()"></textarea>
+                </div>
+                <div class="form-select" id="code_@dr["TaskId"].ToString()">
+                    <label for="revcodeOption_@dr["TaskId"].ToString()" asp-for="Code" class="control-label">Process</label>
+                    <select id="revcodeOption_@dr["TaskId"].ToString()" asp-for="Code" class="form-control">
+                        @foreach (System.Data.DataRow dar in ViewBag.Process.Rows)
+                        {
+                            <option value="@dar["Code"].ToString()">@dar["Process"].ToString()</option>
+                        }
+                    </select>
+                </div>
+                <div class="form-select" id="assign_@dr["TaskId"].ToString()" style="display: block">
+                    <label for="revassignOption_@dr["TaskId"].ToString()" asp-for="FwdId" class="control-label">Select Assignee</label>
+                    <select id="revassignOption_@dr["TaskId"].ToString()" asp-for="FwdId" placeholder="Search...">
+                        @foreach (System.Data.DataRow dar in ViewBag.Users.Rows)
+                        {
+                            <option value="@dar["Id"].ToString()">@dar["Name"].ToString(): @dar["Position"].ToString()</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()" />
+                <input type="hidden" id="revtaskval_@dr["TaskId"].ToString()" value="@dr["Task"].ToString()" />
+                <input type="hidden" id="revdetailsval_@dr["TaskId"].ToString()" value="@dr["Details"].ToString()" />
+                <button type="button" class="btn btn-outline-primary" data-task-id="@dr["TaskId"].ToString()" id="confirmRevise_@dr["TaskId"].ToString()">Confirm</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </form>
+    </div>
+}
+<script>
+    $(document).ready(function () {
+        function init(taskId) {
+            var $select = $('#revassignOption_' + taskId);
+
+            $('#revcodeOption_' + taskId).on('change', function () {
+                if ($(this).val() === 'Q7') {
+                    $('#assign_' + taskId).hide();
+                } else {
+                    $('#assign_' + taskId).show();
+                }
+            });
+
+            if ($select.data('selectize')) {
+                $select[0].selectize.destroy();
+            }
+
+            $select.selectize({
+                allowEmptyOption: false,
+                create: false,
+                sortField: 'text'
+            });
+        }
+
+        $('#ReviseModal').on('shown.bs.modal', function (e) {
+            var taskId = $(e.relatedTarget).data('taskid');
+            init(taskId);
+
+            $('#confirmRevise_' + taskId).on('click', function () {
+                var revtask = $('#revtask_' + taskId);
+                var revdetails = $('#revdetails_' + taskId);
+                var revtaskval = $('#revtaskval_' + taskId).val();
+                var revdetailsval = $('#revdetailsval_' + taskId).val();
+
+                if (revtask.val().trim() === "") {
+                    revtask.val(revtaskval);
+                }
+                if (revdetails.val().trim() === "") {
+                    revdetails.val(revdetailsval);
+                }
+                $('#revform_' + taskId).submit();
+            });
+        });
+    });
+
+    function submitForm(formId) {
+        $(formId).submit();
+    }
+</script>

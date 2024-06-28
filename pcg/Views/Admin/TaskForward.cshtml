@@ -20,7 +20,6 @@
         <tr>
             <th class="text-center text-uppercase">TaskId</th>
             <th class="text-center text-uppercase">Task</th>
-            <th class="text-center text-uppercase">Remarks</th> 
             <th class="text-center text-uppercase">Description</th>
             <th class="text-center text-uppercase">Assignee</th>
         </tr>
@@ -31,7 +30,6 @@
             <tr>
                 <td class="text-center text-nowrap">@dr["TaskId"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["Task"].ToString()</td>
-                <td class="text-center text-nowrap">@dr["Remarks"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["Description"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["Name"].ToString()</td>       
             </tr>
@@ -45,8 +43,8 @@
         <input asp-for="Task" class="form-control" value="@dr["Task"].ToString()" placeholder="@dr["Task"].ToString()"/>
     </div>
     <div class="form-group">
-        <label asp-for="Remarks" class="control-label">Change Remarks (Optional)</label>
-        <input asp-for="Remarks" class="form-control" value="@dr["Remarks"].ToString()" placeholder="@dr["Remarks"].ToString()"/>
+        <label asp-for="Details" class="control-label">Change Details (Optional)</label>
+        <textarea asp-for="Details" class="form-control" value="@dr["Details"].ToString()" placeholder="@dr["Details"].ToString()"></textarea>
     </div>
  }
     <div class="form-group" id="code">

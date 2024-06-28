@@ -16,7 +16,7 @@
             @foreach (System.Data.DataRow dr in ViewBag.Pending.Rows)
             {
                 <h5 class="card-title">New Pending</h5>
-                <h6 class="card-subtitle mb-2 text-body-secondary">Task: @dr["Task"].ToString() @dr["Remarks"].ToString() @dr["Description"].ToString()</h6>
+                <h6 class="card-subtitle mb-2 text-body-secondary">Task: @dr["Task"].ToString() @dr["Details"].ToString() @dr["Description"].ToString()</h6>
                 <a class="btn btn-primary btn-block" asp-controller="User" asp-action="Pending">Pending</a>
             }   
         </div>

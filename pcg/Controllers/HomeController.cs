@@ -21,9 +21,9 @@ namespace pcg.Controllers
         public SqlConnection con;
         public SqlCommand cmd;
         private readonly IConfiguration _configuration;
-        private readonly DatabaseContext _dbContext;
+        private readonly PCGContext _dbContext;
 
-        public HomeController(IConfiguration configuration, DatabaseContext dbContext)
+        public HomeController(IConfiguration configuration, PCGContext dbContext)
         {
             _configuration = configuration;
             con = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
@@ -91,13 +91,14 @@ namespace pcg.Controllers
                 }
                 else
                 {
-                    cmd = new SqlCommand("INSERT INTO Users (Username, Password, Name, Email, ContactNo, Position) " +
+                    cmd = new SqlCommand("INSERT INTO Users (Username, Password, Name, Email, ContactNo, Position, Status) " +
                             "VALUES ('" + reg.Username + "', '" +
                             reg.Password + "', '" +
                             reg.Name + "', '" +
                             reg.Email + "', '" +
                             reg.ContactNo + "', '" +
-                            reg.Position + "')", con);
+                            reg.Position + "', '" +
+                            "Pending')", con);
                     cmd.ExecuteNonQuery();
                 }
                 if (con.State == ConnectionState.Open)

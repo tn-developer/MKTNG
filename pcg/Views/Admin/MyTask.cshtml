@@ -9,9 +9,11 @@
     <meta http-equiv="Expires" content="0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap5.min.css">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/custom.css"/>
 </head>
 <h1 style="text-align:center">My Task</h1>
-<table class="table table-hover table-responsive-sm table-sm">
+<div class="ccard" style="overflow-x: auto; max-width: 100%; border: 1px solid darkgray; border-collapse: collapse;">
+    <table class="ctable ctable-hover ctable-responsive-sm ctable-sm" id="datatable" style="width: 100%; white-space: nowrap;">
     <thead>
         <tr>
             <th class="text-center text-uppercase">Task No.</th>
@@ -25,284 +27,418 @@
         </tr>
     </thead>
     <tbody id="myTable">
-        @foreach (System.Data.DataRow dr in ViewBag.Tasklog.Rows)
+            @foreach (System.Data.DataRow dr in ViewBag.Tasklog.Rows)
         {
-            <tr data-taskid="@dr["TaskId"].ToString()">
-                <td class="text-center text-nowrap">@dr["TaskId"].ToString()</td>
+                <tr id="row_@dr["TaskId"]" data-taskid="@dr["TaskId"].ToString()">
+                <td class="text-center text-nowrap show-details">@dr["TaskId"].ToString()</td>
                 @if ((int)dr["Circulation"] >= 1)
                 {
                     int cir = (int)dr["Circulation"] + 1;
-                    <td class="text-center text-nowrap" style="font-weight: bold;">
-                        @dr["Task"].ToString() @dr["Remarks"].ToString() @dr["Description"].ToString() v@(cir)
+                    <td class="text-center text-nowrap show-details" style="font-weight: bold;">
+                        @dr["Task"].ToString() @dr["Description"].ToString() v@(cir)
                     </td>
                 }
                 else
                 {
-                    <td class="text-center text-nowrap" style="font-weight: bold;">@dr["Task"].ToString() @dr["Remarks"].ToString() @dr["Description"].ToString()</td>
+                        <td class="text-center text-nowrap show-details" style="font-weight: bold;">@dr["Task"].ToString() @dr["Description"].ToString()</td>
                 }
-                <td class="text-center text-nowrap">@dr["Client"].ToString() @dr["Site"].ToString()</td>
-                <td class="text-center text-nowrap">@dr["AddedBy"].ToString()</td>
-                <td class="text-center text-nowrap">@dr["DateFwd"].ToString()</td>
-                <td class="text-center text-nowrap">@dr["DateRcv"].ToString()</td>
-                <td class="text-center text-nowrap">@dr["Name"].ToString()</td>
+                <td class="text-center text-nowrap show-details">@dr["Client"].ToString() @dr["Site"].ToString()</td>
+                <td class="text-center text-nowrap show-details">@dr["AddedBy"].ToString()</td>
+                <td class="text-center text-nowrap show-details">@dr["DateFwd"].ToString()</td>
+                <td class="text-center text-nowrap show-details">@dr["DateRcv"].ToString()</td>
+                <td class="text-center text-nowrap show-details">@dr["Name"].ToString()</td>
                 <td>
                     @if (dr["Process"].ToString() == "Q7")
                     {
-                        <div class="modal fade" id="Revise_@dr["TaskId"].ToString()" tabindex="-1" aria-labelledby="reviseModal_@dr["TaskId"].ToString()" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h1 class="modal-title fs-5" id="reviseModal_@dr["TaskId"].ToString()">Revise</h1>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeRevise('@dr["TaskId"].ToString()')"></button>
+                            <div class="modal fade" id="Sts_@dr["TaskId"].ToString()" tabindex="-1" aria-labelledby="stsModal_@dr["TaskId"].ToString()" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h1 class="modal-title fs-5" id="stsModal_@dr["TaskId"].ToString()">Send to site</h1>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="closeSts('@dr["TaskId"].ToString()')" aria-label="Close"></button>
+                                        </div>
+                                        <form asp-controller="Admin" asp-action="TaskForward" method="post">
+                                            <div class="modal-body">
+                                                <p>Are you sure to send this to site?</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()" />
+                                                <input type="hidden" asp-for="Task" value="@dr["Task"].ToString()" />
+                                                <input type="hidden" asp-for="Details" value="@dr["Details"].ToString()" />
+                                                <input type="hidden" asp-for="AssignId" value="@ViewData["SessionId"]" />
+                                                <input type="hidden" asp-for="Code" value="Q8"/>
+                                                <input type="hidden" asp-for="SiteSC" value="@dr["SiteSC"].ToString()" />
+                                                <input type="hidden" asp-for="SiteTK" value="@dr["SiteTK"].ToString()" />
+                                                <button type="submit" class="btn btn-outline-info" id="confirmSts('@dr["TaskId"].ToString()')">Confirm</button>
+                                                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </form>
                                     </div>
-                                    <form asp-controller="Admin" asp-action="Revise" method="post">
-                                        <div class="modal-body">
-                                            <div class="form-group">
-                                                <label asp-for="Task" class="control-label">Change Task Name (Optional)</label>
-                                                <input id="revtask_@dr["TaskId"].ToString()" asp-for="Task" class="form-control" value="@dr["Task"].ToString()" placeholder="@dr["Task"].ToString()" />
-                                            </div>
-                                            <div class="form-group">
-                                                <label asp-for="Remarks" class="control-label">Change Remarks (Optional)</label>
-                                                <input id="revremarks_@dr["TaskId"].ToString()" asp-for="Remarks" class="form-control" value="@dr["Remarks"].ToString()" placeholder="@dr["Remarks"].ToString()" />
-                                            </div>
-                                            <div class="form-select" id="code">
-                                                <label for="codeOption_@dr["TaskId"].ToString()" asp-for="Code" class="control-label">Process</label>
-                                                <select id="codeOption_@dr["TaskId"].ToString()" asp-for="Code" class="form-control">
-                                                    @foreach (System.Data.DataRow dar in ViewBag.Process.Rows)
-                                                    {
-                                                        <option value="@dar["Code"].ToString()">@dar["Process"].ToString()</option>
-                                                    }
-                                                </select>
-                                            </div>
-                                            <div class="form-select" id="assign_@dr["TaskId"].ToString()" style="display: block">
-                                                <label for="assignOption_@dr["TaskId"].ToString()" asp-for="FwdId" class="control-label">Select Assignee</label>
-                                                <select id="assignOption_@dr["TaskId"].ToString()" asp-for="FwdId" placeholder="Search...">
-                                                    @foreach (System.Data.DataRow dar in ViewBag.Users.Rows)
-                                                    {
-                                                        <option value="@dar["Id"].ToString()">@dar["Name"].ToString(): @dar["Position"].ToString()</option>
-                                                    }
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()"/>
-                                            <input type="hidden" id="revtaskval_@dr["TaskId"].ToString()" value="@dr["Task"].ToString()" />
-                                            <input type="hidden" id="revremarksval_@dr["TaskId"].ToString()" value="@dr["Remarks"].ToString()" />
-                                            <button type="button" class="btn btn-outline-primary" onclick="confirmRevise('@dr["TaskId"].ToString()')">Confirm</button>
-                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="closeRevise('@dr["TaskId"].ToString()')">Close</button>
-                                        </div>
-                                    </form>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="modal fade" id="Clr_@dr["TaskId"].ToString()" tabindex="-1" aria-labelledby="clrModal_@dr["TaskId"].ToString()" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h1 class="modal-title fs-5" id="clrModal_@dr["TaskId"].ToString()l">Complete</h1>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="closeClr('@dr["TaskId"].ToString()')" aria-label="Close"></button>
-                                    </div>
-                                    <form asp-controller="Admin" asp-action="Complete" method="post">
-                                        <div class="modal-body">
-                                            <p>Are you sure this task is completed?</p>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()"/>
-                                            <input type="hidden" asp-for="Task" value="@dr["Task"].ToString()"/>
-                                            <input type="hidden" asp-for="Remarks" value="@dr["Remarks"].ToString()"/>
-                                            <input type="hidden" asp-for="AssignId" value="@ViewData["SessionId"]" />
-                                            <button type="button" class="btn btn-outline-info" onclick="confirmClr('@dr["TaskId"].ToString()')">Confirm</button>
-                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="closeClr('@dr["TaskId"].ToString()')">Close</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
+                        
                         <div class="d-flex justify-content-center">
-                            <button type="button" class="btn btn-info mr-1" data-bs-toggle="modal" data-bs-target="#Revise_@dr["TaskId"].ToString()">Revise</button>
-                            <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#Clr_@dr["TaskId"].ToString()">Complete</button>
+                            <button id="btnRevise_@dr["TaskId"].ToString()" data-taskid="@dr["TaskId"].ToString()" type="button" class="btn btn-info" style="height: 25px; line-height: 12px; margin-right: 3px" data-bs-toggle="modal" data-bs-target="#ReviseModal">Revise</button>
+                            <button type="button" class="btn btn-primary" style="height: 25px; line-height: 12px;" data-bs-toggle="modal" data-bs-target="#Sts_@dr["TaskId"].ToString()">Send to Site</button>
                         </div>
                     }
                     else
                     {
-                        <div class="modal fade" id="Fwd_@dr["TaskId"].ToString()" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="fwdModal_@dr["TaskId"].ToString()" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h1 class="modal-title fs-5" id="fwdModal_@dr["TaskId"].ToString()">Forward Task</h1>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="closeFwd('@dr["TaskId"].ToString()')"></button>
-                                    </div>
-                                    <form asp-controller="Admin" asp-action="TaskForward" method="post">
-                                        <div class="modal-body">
-                                            <div style="display: flex; justify-content: center; width: 100%;">
-                                            <table>
-                                                <thead>
-                                                    <tr>
-                                                        <th class="text-center text-uppercase">Task No.</th>
-                                                        <th class="text-center text-uppercase">task info</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <tr>
-                                                        <td class="text-center text-nowrap">@dr["TaskId"].ToString()</td>
-                                                            <td class="text-center text-nowrap">@dr["Task"].ToString() <br/> @dr["Remarks"].ToString() <br/> @dr["Description"].ToString()</td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            </div>
-                                            <div class="form-group">
-                                                <label asp-for="Task" class="control-label">Change Task Name (Optional)</label>
-                                                <input id="fwdtask_@dr["TaskId"].ToString()" asp-for="Task" class="form-control" value="@dr["Task"].ToString()" placeholder="@dr["Task"].ToString()" />
-                                            </div>
-                                            <div class="form-group">
-                                                <label asp-for="Remarks" class="control-label">Change Remarks (Optional)</label>
-                                                <input id="fwdremarks_@dr["TaskId"].ToString()" asp-for="Remarks" class="form-control" value="@dr["Remarks"].ToString()" placeholder="@dr["Remarks"].ToString()" />
-                                            </div>
-                                        
-                                        <div class="form-select" id="code">
-                                            <label for="codeOption_@dr["TaskId"].ToString()" asp-for="Code" class="control-label">Process</label>
-                                                <select id="codeOption_@dr["TaskId"].ToString()" asp-for="Code" class="form-control">
-                                                @foreach (System.Data.DataRow dar in ViewBag.Process.Rows)
-                                                {
-                                                    <option value="@dar["Code"].ToString()">@dar["Process"].ToString()</option>
-                                                }
-                                            </select>
-                                        </div>
-                                        <div class="form-select" id="assign_@dr["TaskId"].ToString()" style="display: block">
-                                            <label for="assignOption_@dr["TaskId"].ToString()" asp-for="FwdId" class="control-label">Select Assignee</label>
-                                               <select id="assignOption_@dr["TaskId"].ToString()" asp-for="FwdId" placeholder="Search...">
-                                               @foreach (System.Data.DataRow dar in ViewBag.Users.Rows)
-                                                {
-                                                    <option value="@dar["Id"].ToString()">@dar["Name"].ToString(): @dar["Position"].ToString()</option>
-                                                }
-                                            </select>
-                                        </div>
-                                    </div>
-                                        <div class="modal-footer">
-                                            <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()"/>
-                                            <input type="hidden" asp-for="AssignId" value="@ViewData["SessionId"]"/>
-                                            <input type="hidden" id="fwdtaskval_@dr["TaskId"].ToString()" value="@dr["Task"].ToString()" />
-                                            <input type="hidden" id="fwdremarksval_@dr["TaskId"].ToString()" value="@dr["Remarks"].ToString()" />
-                                            <button type="button" class="btn btn-outline-primary" onclick="confirmFwd('@dr["TaskId"].ToString()')">Confirm</button>
-                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal" onclick="closeFwd('@dr["TaskId"].ToString()')">Close</button>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-
                         <div class="d-flex justify-content-center">
-                            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#Fwd_@dr["TaskId"].ToString()">Forward</button>
+                            <button id="btnFwd_@dr["TaskId"].ToString()" data-taskid="@dr["TaskId"].ToString()" type="button" class="btn btn-primary" style="height: 25px; line-height: 12px; margin-right: 3px" data-bs-toggle="modal" data-bs-target="#FwdModal">Forward</button>
+                            <button id="showUpload_@dr["TaskId"].ToString()" data-taskid="@dr["TaskId"].ToString()" type="button" class="btn btn-info" style="height: 25px; line-height: 12px">Upload</button>
                         </div>
                     }
                     </tr>     
         }
-    </tbody>
+    </tbody> 
 </table>
+</div>
+
+<ul id="numbers" class="cpagination"></ul>
+
+<div class="modal fade" id="ReviseModal" tabindex="-1" aria-labelledby="ReviseModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="ReviseModalLabel">Revise Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- _Forward content -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="FwdModal" tabindex="-1" aria-labelledby="FwdModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="FwdModalLabel">Forward Task</h5>
+                
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- _Forward content -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="detailsModalLabel">Task Info</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- _TaskDetails -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="uploadModal" tabindex="-1" aria-labelledby="uploadModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadModalLabel">Upload File</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="uploadModalBody">
+                <!-- Content will be loaded here dynamically -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section scripts {
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.7/umd/popper.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js"></script>
+
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-            $(document).ready(function () {
-                $('#myTable tr').click(function () {
-                    var Id = $(this).data('taskid');
-                    showoptions(Id);
+        document.addEventListener('DOMContentLoaded', function () {
+            function updateFileIcon() {
+                const fileInput = document.getElementById('formFile');
+                const file = fileInput.files[0];
+                const fileType = file ? file.name.split('.').pop().toLowerCase() : 'default';
+                const fileIcon = document.getElementById('fileIcon');
 
-                    $('#assignOption_' + Id).selectize({
-                        allowEmptyOption: false,
-                        create: false,
-                        sortField: 'text',
-                    });
-                });
-            });
+                const fileTypeIcons = {
+                    'pdf': '/images/icons/pdf.png',
+                    'doc': '/images/icons/docs.png',
+                    'docx': '/images/icons/docs.png',
+                    'txt': '/images/icons/txtfile.png',
+                    'jpg': '/images/icons/camerafile.png',
+                    'jpeg': '/images/icons/camerafile.png',
+                    'png': '/images/icons/camerafile.png',
+                    'xls': '/images/icons/excelfile.png',
+                    'xlsx': '/images/icons/excelfile.png',
+                    'ppt': '/images/icons/pptfile.png',
+                    'pptx': '/images/icons/pptfile.png',
+                    'unknown': '/images/icons/unsupportedfile.png',
+                    'default': '/images/icons/uploadfile.png'
+                };
 
-            function showoptions(id) {
-                var codeOption = document.getElementById("codeOption_" + id).value;
-                var assignDiv = document.getElementById("assign_" + id);
-                var assignOption = document.getElementById("assignOption_" + id);
-
-                if (codeOption === "Q7") {
-                    assignDiv.style.display = "none";
-                }
-                else {
-                    assignDiv.style.display = "block";
+                const iconSrc = fileTypeIcons[fileType] || fileTypeIcons['unknown'];
+                if (fileIcon) {
+                    fileIcon.src = iconSrc;
                 }
             }
 
-            document.getElementById("codeOption_" + Id).addEventListener("change", function () {
-                var Id = this.value;
-                showoptions(Id);
+            function resetFileInputAndIcon() {
+                const fileIcon = document.getElementById('fileIcon');
+                const fileInput = document.getElementById('formFile');
+
+                if (fileIcon) {
+                    fileIcon.src = '/images/icons/uploadfile.png';
+                }
+                if (fileInput) {
+                    fileInput.value = '';
+                    const event = new Event('change');
+                    fileInput.dispatchEvent(event);
+                }
+            }
+
+            document.addEventListener('change', function (event) {
+                if (event.target && event.target.id === 'formFile') {
+                    updateFileIcon();
+                }
+            });
+
+            document.addEventListener('hidden.bs.modal', function (event) {
+                if (event.target && event.target.id === 'fileUploadModal') {
+                    resetFileInputAndIcon();
+                }
             });
         });
 
-        function openRevise(taskId) {
-            $('#Revise_' + taskId).modal('show');
-        }
+        $(document).ready(function () {
+            console.log("Document ready function executed.");
+            $('table tbody').on('click', 'tr[id^="row_"] .show-details', function () {
+                var $tr = $(this).closest('tr[id^="row_"]');
+                var taskId = $tr.data('taskid');
+                if (!taskId) {
+                    alert('Task ID is missing.');
+                    return;
+                }
+                var url = '/Admin/TaskDetails?taskId=' + encodeURIComponent(taskId);
 
-        function confirmRevise(taskId) {
-            var revtask = document.getElementById("revtask_" + taskId);
-            var revremarks = document.getElementById("revremarks_" + taskId);
-            var revtaskval = document.getElementById("revtaskval_" + taskId).value;
-            var revremarksval = document.getElementById("revremarksval_" + taskId).value;
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    success: function (data) {
+                        $('#detailsModal .modal-body').html(data);
+                        $('#detailsModal').modal('show');
+                    },
+                    error: function () {
+                        alert('Failed to load task details.');
+                    }
+                });
+            });
 
-            if (revtask.value.trim() === "") {
-                revtask.value = revtaskval;
+            $('button[id^="btnFwd_"]').click(function () {
+                var $button = $(this).closest('button[id^="btnFwd_"]');
+                var taskId = $button.data('taskid');
+                var url = '/Admin/Forward?taskId=' + encodeURIComponent(taskId);
+
+                console.log(taskId);
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    success: function (data) {
+                        $('#FwdModal .modal-body').html(data);
+                        $('#FwdModal').modal('show');
+                    },
+                    error: function () {
+                        alert('Failed to load content.');
+                    }
+                });
+            });
+
+            $('button[id^="btnRevise_"]').click(function () {
+                var $button = $(this).closest('button[id^="btnRevise_"]');
+                var taskId = $button.data('taskid');
+                var url = '/Admin/Revise?taskId=' + encodeURIComponent(taskId);
+
+                console.log(taskId);
+                $.ajax({
+                    url: url,
+                    type: 'GET',
+                    success: function (data) {
+                        $('#ReviseModal .modal-body').html(data);
+                        $('#ReviseModal').modal('show');
+                    },
+                    error: function () {
+                        alert('Failed to load content.');
+                    }
+                });
+            });
+
+            $('button[id^="showUpload_"]').click(function (event) {
+                event.preventDefault();
+
+                var taskId = $(this).data('taskid');
+
+                $.ajax({
+                    url: '/Admin/Upload?taskid=' + encodeURIComponent(taskId),
+                    type: 'GET',
+                    success: function (data) {
+                        $('#uploadModalBody').html(data);
+                        var uploadModal = new bootstrap.Modal(document.getElementById('uploadModal'));
+                        uploadModal.show();
+                    },
+                    error: function () {
+                        alert('Failed to load the modal content.');
+                    }
+                });
+            });
+
+            $(document).on('submit', '#uploadForm', function (event) {
+                event.preventDefault();
+
+                var form = $(this);
+                var formData = new FormData(this);
+
+                $.ajax({
+                    url: form.attr('action'),
+                    type: 'POST',
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        $('#uploadModalBody').html(response); // Reload the modal content with validation results
+                    },
+                    error: function () {
+                        alert('File upload failed.');
+                    }
+                });
+            });
+
+
+            var sortOrder = 1;
+            var currentPage = 1;
+
+            function splitAlphaNum(str) {
+                return str.split(/(\d+)/).map(part => isNaN(part) ? part : parseInt(part, 10));
             }
-            if (revremarks.value.trim() === "") {
-                revremarks.value = revremarksval;
+
+            $('th').on('click', function () {
+                var index = $(this).index();
+                var rows = $('#datatable tbody tr').get();
+
+                $('th').find('.sort-arrow').remove();
+
+                $(this).append('<span class="sort-arrow">' + (sortOrder === 1 ? ' ▲' : ' ▼') + '</span>');
+
+                rows.sort(function (a, b) {
+                    var A = $(a).children('td').eq(index).text().trim();
+                    var B = $(b).children('td').eq(index).text().trim();
+
+                    var partsA = splitAlphaNum(A);
+                    var partsB = splitAlphaNum(B);
+
+                    for (var i = 0; i < Math.min(partsA.length, partsB.length); i++) {
+                        if (partsA[i] < partsB[i]) return -1 * sortOrder;
+                        if (partsA[i] > partsB[i]) return 1 * sortOrder;
+                    }
+
+                    return (partsA.length - partsB.length) * sortOrder;
+                });
+
+                sortOrder *= -1;
+
+                $.each(rows, function (index, row) {
+                    $('#datatable tbody').append(row);
+                });
+
+                paginate(currentPage);
+            });
+
+            function paginate(page) {
+                const rowsPerPage = 10;
+                const rows = $('#datatable tbody tr');
+                const rowsCount = rows.length;
+                const pageCount = Math.ceil(rowsCount / rowsPerPage);
+                const numbers = $('#numbers');
+
+                function generatePageNumbers(currentPage) {
+                    numbers.empty();
+                    numbers.append('<li class="cpage-item" id="prev-page"><a class="cpage-link" href="#"><</a></li>');
+
+                    let startPage = Math.max(1, currentPage - 2);
+                    let endPage = Math.min(pageCount, currentPage + 2);
+
+                    if (currentPage <= 3) {
+                        endPage = Math.min(5, pageCount);
+                    } else if (currentPage >= pageCount - 2) {
+                        startPage = Math.max(pageCount - 4, 1);
+                    }
+
+                    for (let i = startPage; i <= endPage; i++) {
+                        if (i === currentPage) {
+                            numbers.append('<li class="cpage-item active"><a class="cpage-link" href="#">' + i + '</a></li>');
+                        } else {
+                            numbers.append('<li class="cpage-item"><a class="cpage-link" href="#">' + i + '</a></li>');
+                        }
+                    }
+
+                    numbers.append('<li class="cpage-item" id="next-page"><a class="cpage-link" href="#">></a></li>');
+                    togglePaginationButtons(currentPage, pageCount);
+                }
+
+                function displayRows(index, rows) {
+                    const start = (index - 1) * rowsPerPage;
+                    const end = start + rowsPerPage;
+                    rows.hide();
+                    rows.slice(start, end).show();
+
+                    rows.css('border-bottom', 'none');
+                    rows.slice(start, end).last().css('border-bottom', '1px solid black');
+                }
+
+                function togglePaginationButtons(currentPage, pageCount) {
+                    $('#prev-page').toggleClass('disabled', currentPage === 1);
+                    $('#next-page').toggleClass('disabled', currentPage === pageCount);
+
+                    $('#numbers li').removeClass('active');
+                    $('#numbers li').eq(currentPage).addClass('active');
+                }
+
+                numbers.off('click').on('click', 'li.cpage-item a', function (e) {
+                    e.preventDefault();
+                    let pageNumber = $(this).text();
+
+                    if (pageNumber === '>') {
+                        pageNumber = currentPage + 1;
+                    } else if (pageNumber === '<') {
+                        pageNumber = currentPage - 1;
+                    } else {
+                        pageNumber = parseInt(pageNumber);
+                    }
+
+                    if (pageNumber >= 1 && pageNumber <= pageCount && pageNumber !== currentPage) {
+                        currentPage = pageNumber;
+                        displayRows(pageNumber, rows);
+                        generatePageNumbers(pageNumber);
+                        togglePaginationButtons(pageNumber, pageCount);
+                    }
+                });
+
+                generatePageNumbers(page);
+                displayRows(page, rows);
             }
-
-            $('#Revise_' + taskId).modal('hide');
-            var form = $('#Revise_' + taskId).find('form');
-            form.submit();
-        }
-
-        function closeRevise(taskId) {
-            $('#Revise_' + taskId).modal('hide');
-        }
-
-        function openFwd(taskId) {
-            $('#Fwd_' + taskId).modal('show');
-        }
-
-        function confirmFwd(taskId) {
-            var fwdtask = document.getElementById("fwdtask_" + taskId);
-            var fwdremarks = document.getElementById("fwdremarks_" + taskId);
-            var fwdtaskval = document.getElementById("fwdtaskval_" + taskId).value;
-            var fwdremarksval = document.getElementById("fwdremarksval_" + taskId).value;
-
-            if (fwdtask.value.trim() === "") {
-                fwdtask.value = fwdtaskval;
-            }
-            if (fwdremarks.value.trim() === "") {
-                fwdremarks.value = fwdremarksval;
-            }
-
-            var form = $('#Fwd_' + taskId).find('form');
-            form.submit();
-            $('#Fwd_' + taskId).modal('hide');
-        }
-
-        function closeFwd(taskId) {
-            $('#Fwd_' + taskId).modal('hide');
-        }
-
-        function openClr(taskId) {
-            $('#Clr_' + taskId).modal('show');
-        }
-
-        function confirmClr(taskId) {
-            $('#Clr_' + taskId).modal('hide');
-            var form = $('#Clr_' + taskId).find('form');
-            form.submit();
-        }
-
-        function closeClr(taskId) {
-            $('#Clr_' + taskId).modal('hide');
-        }
+            paginate(1);
+        });
     </script>
 }

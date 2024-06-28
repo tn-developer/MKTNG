@@ -27,9 +27,9 @@ namespace pcg.Controllers
         public SqlConnection con;
         public SqlCommand cmd;
         private readonly IConfiguration _configuration;
-        private readonly DatabaseContext _dbContext;
+        private readonly PCGContext _dbContext;
 
-        public UserController(IConfiguration configuration, DatabaseContext dbContext)
+        public UserController(IConfiguration configuration, PCGContext dbContext)
         {
             _configuration = configuration;
             con = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
@@ -56,7 +56,7 @@ namespace pcg.Controllers
                 cmd = new SqlCommand("SELECT t.TaskId, " +
                         " t.Task," +
                         " t.Description," +
-                        " t.Remarks," +
+                        " t.Details," +
                         " t.AddedBy," +
                         " t.SiteReqId," +
                         " t.DateStart," +
@@ -266,12 +266,12 @@ namespace pcg.Controllers
             string sesname = HttpContext.Session.GetString(SessionName);
 
             if (HttpContext.Session.GetString(SessionType) == "SUser") {
-                cmd = new SqlCommand("SELECT t.TaskId AS TaskID_Tasks," +
+                cmd = new SqlCommand("SELECT t.TaskId," +
                     " t.Task," +
                     " t.Description," +
-                    " t.Remarks," +
+                    " t.Details," +
                     " t.AddedBy," +
-                    " t.SiteReqId," +
+                    " t.SiteReqId AS SiteId," +
                     " t.DateStart," +
                     " t.DateFwd," +
                     " t.DateRcv," +
@@ -295,25 +295,26 @@ namespace pcg.Controllers
 
             if (HttpContext.Session.GetString(SessionType) == "User")
             {
-                cmd = new SqlCommand("SELECT t.TaskId AS TaskID_Tasks," +
+                cmd = new SqlCommand("SELECT t.TaskId," +
                     " t.Task," +
                     " t.Description," +
-                    " t.Remarks," +
+                    " t.Details," +
                     " t.AddedBy," +
-                    " t.SiteReqId," +
+                    " t.SiteReqId AS SiteId," +
                     " t.DateStart," +
                     " t.DateFwd," +
                     " t.DateRcv," +
                     " t.DateClr," +
                     " t.AssignId," +
                     " t.ForwardId," +
+                    " t.Circulation," +
                     " t.Status," +
                     " u.Id AS Id_user, " +
                     " u.Name AS Name, " +
                     " u.Position FROM Tasks t " +
                     "LEFT JOIN Users u " +
                     "ON t.AssignId = u.Id " +
-                    "WHERE t.SiteReqId = '" + siteId + "' AND t.AddedBy = '" + sesname + "' " +
+                    "WHERE t.SiteReqId = '" + siteId + "' AND t.Status != 'Cleared' AND (t.AddedBy = '" + sesname + "' OR t.AssignId ='" + HttpContext.Session.GetString(SessionId) + "') " +
                     "ORDER BY TaskId DESC", con);
                 DataSet task = new DataSet();
                 SqlDataAdapter tasks = new SqlDataAdapter(cmd);
@@ -348,16 +349,16 @@ namespace pcg.Controllers
                     string sesname = HttpContext.Session.GetString(SessionName);
                     string desc = vm.Description + " " + vm.Descquery + vm.Descdocreq + vm.Descvary;
                     string task = vm.Task.Replace("'", "").Replace("\"", "");
-                    string remarks = vm.Remarks.Replace("'", "").Replace("\"", "");
+                    string details = vm.Details.Replace("'", "").Replace("\"", "");
 
                     DateTime cdt = DateTime.Now;
                     string scdt = cdt.ToString("yyyy-MM-dd HH:mm:ss");
 
-                    using (cmd = new SqlCommand("INSERT INTO Tasks (Task, Remarks, Description, AddedBy, SiteReqId, AssignId, Status, Process, Circulation, DateFwd) " +
-                        "VALUES (@Task, @Remarks, @Description, @AddedBy, @SiteReqId, '0', 'Pre-approve', 'Q1', '0', @DateFwd); SELECT SCOPE_IDENTITY(), Process FROM Tasks WHERE TaskId = SCOPE_IDENTITY();", con))
+                    using (cmd = new SqlCommand("INSERT INTO Tasks (Task, Details, Description, AddedBy, SiteReqId, AssignId, Status, Process, Circulation, DateFwd) " +
+                        "VALUES (@Task, @Details, @Description, @AddedBy, @SiteReqId, '0', 'Pre-approve', 'Q1', '0', @DateFwd); SELECT SCOPE_IDENTITY(), Process FROM Tasks WHERE TaskId = SCOPE_IDENTITY();", con))
                     {
                         cmd.Parameters.AddWithValue("@Task", task);
-                        cmd.Parameters.AddWithValue("@Remarks", remarks);
+                        cmd.Parameters.AddWithValue("@Details", details);
                         cmd.Parameters.AddWithValue("@Description", desc);
                         cmd.Parameters.AddWithValue("@AddedBy", sesname);
                         cmd.Parameters.AddWithValue("@SiteReqId", vm.SiteReqId);
@@ -371,12 +372,12 @@ namespace pcg.Controllers
                         taskId = Convert.ToString(reader[0]);
                         proc = reader["Process"].ToString();
                     }
-                    using (cmd = new SqlCommand("INSERT INTO Tasklog (TaskId, AssignId, Status, Process, Task, Remarks, Circulation, DateFwd) " +
-                        "VALUES (@TaskId, '0', 'Pre-approve', @Process, @Task, @Remarks, '0', @DateFwd)", con))
+                    using (cmd = new SqlCommand("INSERT INTO Tasklog (TaskId, AssignId, Status, Process, Task, Details, Circulation, DateFwd) " +
+                        "VALUES (@TaskId, '0', 'Pre-approve', @Process, @Task, @Details, '0', @DateFwd)", con))
                     {
                         cmd.Parameters.AddWithValue("@TaskId", taskId);
                         cmd.Parameters.AddWithValue("@Task", task);
-                        cmd.Parameters.AddWithValue("@Remarks", remarks);
+                        cmd.Parameters.AddWithValue("@Details", details);
                         cmd.Parameters.AddWithValue("@Process", proc);
                         cmd.Parameters.AddWithValue("@DateFwd", scdt);
                     }
@@ -390,15 +391,15 @@ namespace pcg.Controllers
                     string sesname = HttpContext.Session.GetString(SessionName);
                     string desc = vm.Description + " " + vm.Descquery + vm.Descdocreq + vm.Descvary;
                     string task = vm.Task.Replace("'", "").Replace("\"", "");
-                    string remarks = vm.Remarks.Replace("'", "").Replace("\"", "");
+                    string details = vm.Details.Replace("'", "").Replace("\"", "");
 
                     DateTime cdt = DateTime.Now;
                     string scdt = cdt.ToString("yyyy-MM-dd HH:mm:ss");
-                    using (cmd = new SqlCommand("INSERT INTO Tasks (Task, Remarks, Description, AddedBy, SiteReqId, AssignId, Status, Process, Circulation, DateFwd) " +
-                        "VALUES (@Task, @Remarks, @Description, @AddedBy, @SiteReqId, '0', 'Pre-request', 'Q1', '0', @DateFwd); SELECT SCOPE_IDENTITY(), Process FROM Tasks WHERE TaskId = SCOPE_IDENTITY();", con))
+                    using (cmd = new SqlCommand("INSERT INTO Tasks (Task, Details, Description, AddedBy, SiteReqId, AssignId, Status, Process, Circulation, DateFwd) " +
+                        "VALUES (@Task, @Details, @Description, @AddedBy, @SiteReqId, '0', 'Pre-request', 'Q1', '0', @DateFwd); SELECT SCOPE_IDENTITY(), Process FROM Tasks WHERE TaskId = SCOPE_IDENTITY();", con))
                     {
                         cmd.Parameters.AddWithValue("@Task", task);
-                        cmd.Parameters.AddWithValue("@Remarks", remarks);
+                        cmd.Parameters.AddWithValue("@Details", details);
                         cmd.Parameters.AddWithValue("@Description", desc);
                         cmd.Parameters.AddWithValue("@AddedBy", sesname);
                         cmd.Parameters.AddWithValue("@SiteReqId", vm.SiteReqId);
@@ -412,12 +413,12 @@ namespace pcg.Controllers
                         taskId = Convert.ToString(reader[0]);
                         proc = reader["Process"].ToString();
                     }
-                    using (cmd = new SqlCommand("INSERT INTO Tasklog (TaskId, AssignId, Status, Process, Task, Remarks, Circulation, DateFwd) " +
-                        "VALUES (@TaskId, '0', 'Pre-request', @Process, @Task, @Remarks, '0', @DateFwd)", con))
+                    using (cmd = new SqlCommand("INSERT INTO Tasklog (TaskId, AssignId, Status, Process, Task, Details, Circulation, DateFwd) " +
+                        "VALUES (@TaskId, '0', 'Pre-request', @Process, @Task, @Details, '0', @DateFwd)", con))
                     {
                         cmd.Parameters.AddWithValue("@TaskId", taskId);
                         cmd.Parameters.AddWithValue("@Task", task);
-                        cmd.Parameters.AddWithValue("@Remarks", remarks);
+                        cmd.Parameters.AddWithValue("@Details", details);
                         cmd.Parameters.AddWithValue("@Process", proc);
                         cmd.Parameters.AddWithValue("@DateFwd", scdt);
                     }
@@ -447,7 +448,7 @@ namespace pcg.Controllers
             cmd = new SqlCommand("SELECT t.TaskId, " +
                     " t.Task," +
                     " t.Description," +
-                    " t.Remarks," +
+                    " t.Details," +
                     " t.AddedBy," +
                     " t.SiteReqId," +
                     " t.DateStart," +
@@ -518,25 +519,25 @@ namespace pcg.Controllers
 
             using (cmd = new SqlCommand("UPDATE Tasks SET " +
                 "Task = @Task, " +
-                "Remarks = @Remarks, " +
+                "Details = @Details, " +
                 "Process = @Process, " +
                 "Status = 'Pre-approve' " +
                 "WHERE TaskId = @TaskId", con))
             {
                 cmd.Parameters.AddWithValue("@TaskId", pm.TaskId);
                 cmd.Parameters.AddWithValue("@Task", pm.Task);
-                cmd.Parameters.AddWithValue("@Remarks", pm.Remarks);
+                cmd.Parameters.AddWithValue("@Details", pm.Details);
                 cmd.Parameters.AddWithValue("@Process", pm.Process);
             }
             cmd.ExecuteNonQuery();
 
-            using (cmd = new SqlCommand("INSERT INTO Tasklog (TaskId, AssignId, DateFwd, Status, Process, Task, Remarks, Circulation) " +
-                "VALUES (@TaskId, '0', @DateFwd, 'Pre-approve', @Process, @Task, @Remarks, '0')", con))
+            using (cmd = new SqlCommand("INSERT INTO Tasklog (TaskId, AssignId, DateFwd, Status, Process, Task, Details, Circulation) " +
+                "VALUES (@TaskId, '0', @DateFwd, 'Pre-approve', @Process, @Task, @Details, '0')", con))
             {
                 cmd.Parameters.AddWithValue("@TaskId", pm.TaskId);
                 cmd.Parameters.AddWithValue("@DateFwd", scdt);
                 cmd.Parameters.AddWithValue("@Task", pm.Task);
-                cmd.Parameters.AddWithValue("@Remarks", pm.Remarks);
+                cmd.Parameters.AddWithValue("@Details", pm.Details);
                 cmd.Parameters.AddWithValue("@Process", pm.Process);
             }
             cmd.ExecuteNonQuery();
@@ -568,7 +569,7 @@ namespace pcg.Controllers
             using (cmd = new SqlCommand("UPDATE Tasks SET " +
                 "AssignId = @AssignId, " +
                 "Task = @Task, " +
-                "Remarks = @Remarks, " +
+                "Details = @Details, " +
                 "Process = @Process, " +
                 "Status = 'Declined' " +
                 "WHERE TaskId = @TaskId", con))
@@ -576,19 +577,19 @@ namespace pcg.Controllers
                 cmd.Parameters.AddWithValue("@TaskId", pm.TaskId);
                 cmd.Parameters.AddWithValue("@AssignId", pm.AssignId);
                 cmd.Parameters.AddWithValue("@Task", pm.Task);
-                cmd.Parameters.AddWithValue("@Remarks", pm.Remarks);
+                cmd.Parameters.AddWithValue("@Details", pm.Details);
                 cmd.Parameters.AddWithValue("@Process", pm.Process);
             }
             cmd.ExecuteNonQuery();
 
-            using (cmd = new SqlCommand("INSERT INTO Tasklog (TaskId, AssignId, DateClr, Status, Process, Task, Remarks, Circulation) " +
-                "VALUES (@TaskId, @AssignId, @DateClr, 'Pre-approve', @Process, @Task, @Remarks, '0')", con))
+            using (cmd = new SqlCommand("INSERT INTO Tasklog (TaskId, AssignId, DateClr, Status, Process, Task, Details, Circulation) " +
+                "VALUES (@TaskId, @AssignId, @DateClr, 'Pre-approve', @Process, @Task, @Details, '0')", con))
             {
                 cmd.Parameters.AddWithValue("@TaskId", pm.TaskId);
                 cmd.Parameters.AddWithValue("@AssignId", pm.AssignId);
                 cmd.Parameters.AddWithValue("@DateClr", scdt);
                 cmd.Parameters.AddWithValue("@Task", pm.Task);
-                cmd.Parameters.AddWithValue("@Remarks", pm.Remarks);
+                cmd.Parameters.AddWithValue("@Details", pm.Details);
                 cmd.Parameters.AddWithValue("@Process", pm.Process);
             }
             cmd.ExecuteNonQuery();
@@ -601,7 +602,6 @@ namespace pcg.Controllers
         }
         public IActionResult MyTask()
         {
-
             if (HttpContext.Session.GetString(SessionType) != "User" && HttpContext.Session.GetString(SessionType) != "SUser")
             {
                 return RedirectToAction("Login", "Home");
@@ -618,7 +618,7 @@ namespace pcg.Controllers
             cmd = new SqlCommand("SELECT t.TaskId," +
                 " t.Task," +
                 " t.Description," +
-                " t.Remarks," +
+                " t.Details," +
                 " t.AddedBy," +
                 " t.SiteReqId," +
                 " t.DateStart," +
@@ -674,6 +674,42 @@ namespace pcg.Controllers
                 con.Close();
             }
             return View();
+        }
+        [HttpPost]
+        public IActionResult Recieve(ProcessModel pm)
+        {
+            if (HttpContext.Session.GetString(SessionType) != "User" && HttpContext.Session.GetString(SessionType) != "SUser")
+            {
+                return RedirectToAction("Login", "Home");
+            }
+            if (con.State == ConnectionState.Closed)
+            {
+                con.Open();
+            }
+            DateTime cdt = DateTime.Now;
+            string scdt = cdt.ToString("yyyy-MM-dd HH:mm:ss");
+            using (cmd = new SqlCommand("INSERT INTO Tasklog (TaskId, AssignId, Status, Process, Task, Details, Circulation, DateClr) " +
+                "VALUES (@TaskId, @AssignId, 'Cleared', 'Q8', @Task, @Details, @Circulation, @DateClr)", con))
+            {
+                cmd.Parameters.AddWithValue("@TaskId", pm.TaskId);
+                cmd.Parameters.AddWithValue("@AssignId", pm.AssignId);
+                cmd.Parameters.AddWithValue("@Task", pm.Task);
+                cmd.Parameters.AddWithValue("@Details", pm.Details);
+                cmd.Parameters.AddWithValue("@Circulation", pm.Circulation);
+                cmd.Parameters.AddWithValue("@DateClr", scdt);
+                cmd.ExecuteNonQuery();
+            }
+            using (cmd = new SqlCommand("UPDATE Tasks SET DateClr = @DateClr, Status = 'Clear' WHERE TaskId = @TaskId", con))
+            {
+                cmd.Parameters.AddWithValue("@TaskId", pm.TaskId);
+                cmd.Parameters.AddWithValue("@DateClr", scdt);
+                cmd.ExecuteNonQuery();
+            }
+                if (con.State == ConnectionState.Open)
+                {
+                    con.Close();
+                }
+            return RedirectToAction("TaskDetail", "User", new { siteId = pm.SiteId });
         }
     }
 }

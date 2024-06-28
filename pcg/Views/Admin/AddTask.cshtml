@@ -18,7 +18,7 @@
         }       
 <div class="row">
     <div class="col-md-12">
-        <form asp-action="AddTask">
+        <form asp-action="AddTask" method="post" enctype="multipart/form-data">
         <div asp-validation-summary="All" class="text-danger"></div>
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <div class="form-group">
@@ -26,8 +26,8 @@
         <input asp-for="Task" class="form-control"/>
     </div>                      
     <div class="form-group">
-        <label asp-for="Remarks" class="control-label">Remarks</label>
-        <input asp-for="Remarks" class="form-control"/>
+        <label asp-for="Details" class="control-label">Details</label>
+        <textarea asp-for="Details" class="form-control" rows="4"></textarea>
     </div>
     <div class="form-group">
                     <label asp-for="Description" class="control-label"></label>
@@ -71,13 +71,22 @@
                     }
                 </select>
             </div>
+            <div>
+                <label asp-for="FileAlias" class="control-label">File Name</label>
+                <input asp-for="FileAlias" class="form-control" />
+                <span class="text-danger">@Html.ValidationMessageFor(m => m.FileAlias)</span>
+            </div>
+            <div class="mb-3">
+                <label asp-for="UploadFile" class="form-label">Choose file</label>
+                <input asp-for="UploadFile" class="form-control" type="file">
+                <span class="text-danger">@Html.ValidationMessageFor(m => m.UploadFile)</span>
+            </div>
     <div class="form-group">
             @foreach (System.Data.DataRow dr in ViewBag.Sitelist.Rows)
             {
-            <form asp-action="AddTask" method="post">
                 <input type="hidden" name="SiteReqId" value="@dr["SiteId"].ToString()"/>
-                <button type="submit" href="@Url.Action("AddTask", "Admin", new { siteId = dr["SiteId"].ToString() }) "class="btn btn-primary btn-block">Add Task</button>
-            </form>
+                <input type="hidden" name="siteId" value="@dr["SiteId"].ToString()" />
+                <button type="submit" class="btn btn-primary btn-block">Add Task</button>
             }           
     </div>
         </form>
@@ -85,6 +94,7 @@
 </div>
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 }
 <script>
     function showoptions() {

@@ -8,9 +8,11 @@
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/custom.css" />
 </head>
 <h1 style="text-align:center">Forwarded Task</h1>
-<table class="table table-hover table-responsive-sm table-sm">
+<div class="ccard" style="overflow-x: auto; max-width: 100%; border: 1px solid darkgray; border-collapse: collapse;">
+<table class="ctable ctable-hover ctable-responsive-sm ctable-sm">
     <thead>
         <tr>
             <th class="text-center text-uppercase">Task No.</th>
@@ -31,11 +33,11 @@
                 @if ((int)dr["Circulation"] >= 1)
                 {
                     int cir = (int)dr["Circulation"] + 1;
-                    <td class="text-center text-nowrap" style="font-weight: bold;">@dr["Task"].ToString() @dr["Remarks"].ToString() @dr["Description"].ToString() v@(cir)</td>
+                    <td class="text-center text-nowrap" style="font-weight: bold;">@dr["Task"].ToString() @dr["Description"].ToString() v@(cir)</td>
                 }
                 else
                 {
-                    <td class="text-center text-nowrap" style="font-weight: bold;">@dr["Task"].ToString() @dr["Remarks"].ToString() @dr["Description"].ToString()</td>
+                    <td class="text-center text-nowrap" style="font-weight: bold;">@dr["Task"].ToString() @dr["Description"].ToString()</td>
                 }
                 <td class="text-center text-nowrap">@dr["Client"].ToString() @dr["Site"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["AddedBy"].ToString()</td>
@@ -49,7 +51,7 @@
                             <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()" />
                             <input type="hidden" asp-for="FwdId" value="@dr["ForwardId"].ToString()"/>
                             <input type="hidden" asp-for="Task" value="@dr["TaskRename"].ToString()"/>
-                            <input type="hidden" asp-for="Remarks" value="@dr["RemarksRename"].ToString()"/>
+                            <input type="hidden" asp-for="Details" value="@dr["DetailsRename"].ToString()" />
                             <input type="hidden" asp-for="Code" value="@dr["Process"].ToString()"/>
                             <button type="submit" class="btn btn-primary btn-block">Approve</button>
                         </form>
@@ -63,3 +65,4 @@
         }
     </tbody>
 </table>
+</div>

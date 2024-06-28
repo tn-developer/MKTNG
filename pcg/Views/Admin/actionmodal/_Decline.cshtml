@@ -1,0 +1,39 @@
+﻿@model ProcessModel
+
+@{
+    Layout = null;
+    ViewData["Title"] = "Decline Task";
+}
+<div style="text-align: center">
+    <H3>Task</H3>
+</div>
+@foreach (System.Data.DataRow dr in ViewBag.Taskdecline.Rows)
+{
+<div style="display: flex; align-items: flex-start; justify-content: center; border: 1px solid #000">
+    <div style="width: 50%;">
+        <label style="font-weight: bold; margin-bottom: 0px;">Task:</label>
+        <span style="align-self: flex-start; margin-bottom: 0;">@dr["Task"].ToString()</span>
+    </div>
+    <div style="width: 50%;">
+        <label style="font-weight: bold; margin-bottom: 0px;">Task ID:</label>
+        <span style="align-self: flex-start; margin-bottom: 0;">@dr["TaskID_Tasks"].ToString()</span>
+    </div>
+</div>
+    <div>
+        <form id="declineForm" class="decline-form" asp-controller="Admin" asp-action="Decline" method="post">
+            <div>
+                <label asp-for="Task" class="control-label mb-0">Comment</label>
+                <input id="comment" asp-for="Comment" class="form-control" placeholder="Reason for declining" />
+            </div>
+            <div class="modal-footer">
+                <input type="hidden" asp-for="TaskId" value="@dr["TaskID_Tasks"].ToString()" />
+                <input type="hidden" asp-for="AssignId" value="@dr["AssignId"].ToString()" />
+                <input type="hidden" asp-for="FwdId" value="@dr["ForwardId"].ToString()" />
+                <input type="hidden" asp-for="Task" value="@dr["Task"].ToString()" />
+                <input type="hidden" asp-for="Details" value="@dr["Details"].ToString()" />
+                <input type="hidden" asp-for="Code" value="@dr["Code"].ToString()" />
+                <button type="submit" class="btn btn-danger">Decline</button>
+            </div>
+        </form>
+    </div>
+}

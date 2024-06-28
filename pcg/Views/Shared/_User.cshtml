@@ -76,8 +76,8 @@
     </div>
 
     <footer>
-        <div class="container">
-            <p id="clock"></p>
+        <div style="display: flex; justify-content: center" class="container">
+            <h6 id="clock"></h6>
         </div>
     </footer>
 
@@ -94,8 +94,13 @@
             var ampm = hours >= 12 ? 'PM' : 'AM';
             hours = hours % 12;
             hours = hours ? hours : 12;
+
             var strTime = hours + ':' + minutes + ':' + seconds + ' ' + ampm;
-            document.getElementById('clock').textContent = strTime;
+
+            var options = { year: 'numeric', month: 'long', day: 'numeric' };
+            var strDate = now.toLocaleDateString(undefined, options);
+
+            document.getElementById('clock').textContent = strDate + ' ' + strTime;
         }
         setInterval(updateClock, 1000);
         updateClock();
