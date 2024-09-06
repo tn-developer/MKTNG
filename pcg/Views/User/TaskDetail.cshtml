@@ -24,7 +24,10 @@
             <th class="text-center text-uppercase">Date Received</th>
             <th class="text-center text-uppercase">Assigned To</th>
             <th class="text-center text-uppercase">Status</th>
-            <th class="text-center text-uppercase">Action</th>
+            @* @if (ViewData["SessionType"] == "SOM" || ViewData["SessionType"] == "OM")
+            {
+                <th class="text-center text-uppercase">Action</th>
+            } *@
         </tr>
     </thead>
     <tbody id="myTable">
@@ -40,37 +43,40 @@
                 <td class="text-center text-nowrap">@dr["DateRcv"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["Name"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["Status"].ToString()</td>
-                <td>
-                    <div class="modal fade" id="Clr_@dr["TaskId"]" tabindex="-1" aria-labelledby="ClrModalLabel_@dr["TaskId"]" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h1 class="modal-title fs-5" id="ClrModalLabel_@dr["TaskId"]">Receive</h1>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="closeSts('@dr["TaskId"]')" aria-label="Close"></button>
+                @* @if (ViewData["SessionType"] == "SOM" || ViewData["SessionType"] == "OM")
+                {
+                    <td>
+                        <div class="modal fade" id="Clr_@dr["TaskId"]" tabindex="-1" aria-labelledby="ClrModalLabel_@dr["TaskId"]" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="ClrModalLabel_@dr["TaskId"]">Receive</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" onclick="closeSts('@dr["TaskId"]')" aria-label="Close"></button>
+                                    </div>
+                                    <form asp-controller="User" asp-action="Recieve" method="post">
+                                        <div class="modal-body">
+                                            <p>Are you sure you want to receive this?</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <input type="hidden" asp-for="SiteId" value="@dr["SiteId"].ToString()" />
+                                            <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()" />
+                                            <input type="hidden" asp-for="AssignId" value="@dr["AssignId"].ToString()" />
+                                            <input type="hidden" asp-for="Task" value="@dr["Task"].ToString()" />
+                                            <input type="hidden" asp-for="Details" value="@dr["Details"].ToString()" />
+                                            <input type="hidden" asp-for="Circulation" value="@dr["Circulation"].ToString()" />
+                                            <button type="submit" class="btn btn-outline-info">Confirm</button>
+                                            <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                                        </div>
+                                    </form>
                                 </div>
-                                <form asp-controller="User" asp-action="Recieve" method="post">
-                                    <div class="modal-body">
-                                        <p>Are you sure you want to receive this?</p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <input type="hidden" asp-for="SiteId" value="@dr["SiteId"].ToString()" />
-                                        <input type="hidden" asp-for="TaskId" value="@dr["TaskId"].ToString()"/>
-                                        <input type="hidden" asp-for="AssignId" value="@dr["AssignId"].ToString()"/>
-                                        <input type="hidden" asp-for="Task" value="@dr["Task"].ToString()"/>
-                                        <input type="hidden" asp-for="Details" value="@dr["Details"].ToString()"/>
-                                        <input type="hidden" asp-for="Circulation" value="@dr["Circulation"].ToString()"/>
-                                        <button type="submit" class="btn btn-outline-info">Confirm</button>
-                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-                                    </div>
-                                </form>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="d-flex justify-content-center">
-                        <button id="btnClr_@dr["TaskId"]" data-taskid="@dr["TaskId"]" type="button" class="btn btn-success" style="height: 25px; line-height: 12px; margin-right: 3px" data-bs-toggle="modal" data-bs-target="#Clr_@dr["TaskId"]">Recieve</button>
-                    </div>
-                </td>
+                        <div class="d-flex justify-content-center">
+                            <button id="btnClr_@dr["TaskId"]" data-taskid="@dr["TaskId"]" type="button" class="btn btn-success" style="height: 25px; line-height: 12px; margin-right: 3px" data-bs-toggle="modal" data-bs-target="#Clr_@dr["TaskId"]">Recieve</button>
+                        </div>
+                    </td>
+                } *@
         </tr>
         }
     </tbody>

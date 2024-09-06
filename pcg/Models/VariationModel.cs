@@ -11,6 +11,7 @@ namespace pcg.Models
         [Required(ErrorMessage = "Task cannot be empty.")]
         public string Task { get; set; }
         public string TaskId { get; set; }
+        [Required(ErrorMessage = "Details cannot be empty.")]
         public string Details { get; set; }
         [Required(ErrorMessage = "Description cannot be empty.")]
         public string Description { get; set; }
@@ -19,6 +20,7 @@ namespace pcg.Models
         public string Descdocreq { get; set; }
         public string AssignId { get; set; }
         public string SiteReqId { get; set; }
+        public int SiteId { get; set; }
         public string AddedBy { get; set; }
         public string DateStart { get; set; }
         public string DateFwd { get; set; }

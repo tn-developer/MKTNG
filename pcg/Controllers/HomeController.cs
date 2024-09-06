@@ -107,29 +107,28 @@ namespace pcg.Controllers
                 }
             }           
                 return RedirectToAction("Login","Home");           
-        }       
+        }
         public IActionResult Login()
         {
             string session = HttpContext.Session.GetString(SessionType);
 
-            if (session != null)
+            if (!string.IsNullOrEmpty(session))
             {
-                if (session == "SAdmin")
-                {                   
-                    return RedirectToAction("Index", "Admin");
-                }
-                if (session == "SUser")
+                switch (session)
                 {
-                    return RedirectToAction("Index", "User");
-                }
-                else 
-                {
-                    return RedirectToAction("Index", session);
+                    case "SAdmin":
+                        return RedirectToAction("Index", "Admin");
+                    case "SOM":
+                    case "OM":
+                    case "User":
+                        return RedirectToAction("Index", "User");
+                    default:
+                        return RedirectToAction("Index", session);
                 }
             }
-
             return View();
         }
+
 
         [HttpPost]
         public IActionResult Login(Login log)
@@ -162,21 +161,18 @@ namespace pcg.Controllers
                     {
                         con.Close();
                     }
-                    if (type == "Admin")
+                    switch (type)
                     {
-                        return RedirectToAction("Index", "Admin");
-                    }
-                    if (type == "User")
-                    {
-                        return RedirectToAction("Index", "User");
-                    }
-                    if (type == "SUser")
-                    {
-                        return RedirectToAction("Index", "User");
-                    }
-                    if (type == "SAdmin")
-                    {
-                        return RedirectToAction("Index", "Admin");
+                        case "Admin":
+                        case "SAdmin":
+                            return RedirectToAction("Index", "Admin");
+
+                        case "User":
+                        case "SOM":
+                        case "OM":
+                            return RedirectToAction("Index", "User");
+                        default:
+                            return RedirectToAction("Error", "Home"); 
                     }
                 }
                 else

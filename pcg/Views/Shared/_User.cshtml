@@ -18,7 +18,7 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
                     <ul class="navbar-nav ml-auto">
-                        @if ((string)ViewData["SessionType"] == "SUser")
+                        @if ((string)ViewData["SessionType"] == "SOM" || (string)ViewData["SessionType"] == "OM")
                         {
                             <li class="dropdown">
                                 <button class="dropdown-toggle btn" onfocus="this.blur();" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Tasks</button>

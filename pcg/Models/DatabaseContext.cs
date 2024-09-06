@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Web;
@@ -18,6 +19,7 @@ namespace pcg.Models
         public DbSet<Users> Users { get; set; }
         public DbSet<Taskprocess> Taskprocesses { get; set; }
         public DbSet<Sites> Sites { get; set; }
+        public DbSet<Tasklog> Tasklog { get; set; }
     }
     public class Files 
     {
@@ -50,6 +52,23 @@ namespace pcg.Models
         public int? Circulation { get; set; }
         public string TaskType { get; set; }
         public string? Comment { get; set; }
+    }
+    public class Tasklog
+    {
+        [Key]
+        public int LogId { get; set; }
+        public int TaskId { get; set; }
+        public int AssignId { get; set; }
+        public DateTime? DateStart { get; set; }
+        public DateTime? DateFwd { get; set; }
+        public DateTime? DateRcv { get; set; }
+        public DateTime? DateClr { get; set; }
+        public string Status { get; set; }
+        public string Process { get; set; }
+        public string Task { get; set; }
+        public string Remarks { get; set; }
+        public int? Circulation { get; set; }
+        public string Details { get; set; }
     }
     public class Taskprocess
     {

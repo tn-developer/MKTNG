@@ -1,0 +1,120 @@
+﻿@model VariationModel
+
+<div class="modal-body">
+    <h6>For Task: @Model.SiteId</h6>
+
+    <form id="addtaskForm" method="post" enctype="multipart/form-data" action="/User/AddTask">
+        <div asp-validation-summary="All" class="text-danger"></div>
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label asp-for="Task" class="control-label">Task</label>
+            <input asp-for="Task" class="form-control" />
+        </div>
+        <div class="form-group">
+            <label asp-for="Details" class="control-label">Details</label>
+            <textarea asp-for="Details" class="form-control" rows="4"></textarea>
+        </div>
+        <div class="form-group">
+            <label asp-for="Description" class="control-label"></label>
+            <select id="desc" asp-for="Description" class="form-control" onchange="showoptions()">
+                <option value="Query" selected>Query</option>
+                <option value="Variation">Variation</option>
+                <option value="Document Request">Document Request</option>
+            </select>
+        </div>
+        <div id="query" class="form-group" style="display: block;">
+            <label for="queryoption" asp-for="Descquery" class="control-label">Query</label>
+            <select id="queryoption" asp-for="Descquery" class="form-control">
+                <option value="Plan">Plan</option>
+                <option value="Contract/Billing">Contract/Billing</option>
+                <option value="Schedule">Schedule</option>
+                <option value="Finishing">Finishing</option>
+            </select>
+        </div>
+        <div id="vary" class="form-group" style="display: none;">
+            <label for="varyoption" asp-for="Descvary" class="control-label">Variation</label>
+            <select id="varyoption" asp-for="Descvary" class="form-control">
+                <option value="Owner's Instruction">Owner's Instruction</option>
+                <option value="Subcon">Subcon</option>
+            </select>
+        </div>
+        <div id="docreq" class="form-group" style="display: none;">
+            <label for="docreqoption" asp-for="Descdocreq" class="control-label">Document Request</label>
+            <select id="docreqoption" asp-for="Descdocreq" class="form-control">
+                <option value="Plan">Plan</option>
+                <option value="Contract">Contract</option>
+                <option value="Schedule">Schedule</option>
+                <option value="Finishing">Finishing</option>
+            </select>
+        </div>
+        <div class="d-flex align-items-center">
+            <input type="file" id="addTaskFile" asp-for="UploadFile" style="display:none" required>
+            <label for="addTaskFile" class="upload-label me-2">
+                <img src="~/images/icons/uploadfile.png" alt="File Icon" id="fileIcon" class="custom-icon">
+            </label>
+            <div class="form-floating flex-grow-1 me-2">
+                <input asp-for="FileAlias" class="form-control" id="FileAlias" placeholder="File Name" />
+            </div>
+        </div>
+        <span class="text-danger">@Html.ValidationMessageFor(m => m.FileAlias)</span>
+        <span class="text-danger">@Html.ValidationMessageFor(m => m.UploadFile)</span>
+        @if (ViewBag.SuccessMessage != null)
+        {
+            <div class="text-success">@ViewBag.SuccessMessage</div>
+        }
+        <div class="modal-footer">
+            <input type="hidden" name="siteid" value="@ViewData["SiteId"]" />
+            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        </div>
+    </form>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.5/jquery.validate.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
+
+<script>
+    function showoptions() {
+        var desc = document.getElementById("desc").value;
+        var queryDiv = document.getElementById("query");
+        var queryOption = document.getElementById("queryoption");
+        var docreqDiv = document.getElementById("docreq");
+        var docreqOption = document.getElementById("docreqoption");
+        var varyDiv = document.getElementById("vary");
+        var varyOption = document.getElementById("varyoption");
+
+        if (desc === "Query") {
+            queryDiv.style.display = "block";
+            queryOption.value = "Plan";
+            docreqDiv.style.display = "none";
+            docreqOption.value = "";
+            varyDiv.style.display = "none";
+            varyOption.value = "";
+        }
+        else if (desc === "Document Request") {
+            docreqDiv.style.display = "block";
+            docreqOption.value = "Plan";
+            queryDiv.style.display = "none";
+            queryOption.value = "";
+            varyDiv.style.display = "none";
+            varyOption.value = "";
+        }
+        else if (desc === "Variation") {
+            varyDiv.style.display = "block";
+            varyOption.value = "Owner's Instruction";
+            queryDiv.style.display = "none";
+            queryOption.value = "";
+            docreqDiv.style.display = "none";
+            docreqOption.value = "";
+        }
+        else {
+            queryDiv.style.display = "none";
+            docreqDiv.style.display = "none";
+            varyDiv.style.display = "none";
+            queryOption.value = "";
+            docreqOption.value = "";
+            varyOption.value = "";
+        }
+    }
+    showoptions();
+</script>

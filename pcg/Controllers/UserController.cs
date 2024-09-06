@@ -14,6 +14,11 @@ using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using System.Drawing;
 using System.Diagnostics;
 using System.ComponentModel;
+using Microsoft.AspNetCore.Hosting;
+using pcg.Formula;
+using System.IO;
+using System.Linq;
+using System.Globalization;
 
 namespace pcg.Controllers
 {
@@ -27,18 +32,22 @@ namespace pcg.Controllers
         public SqlConnection con;
         public SqlCommand cmd;
         private readonly IConfiguration _configuration;
-        private readonly PCGContext _dbContext;
+        private readonly PCGContext _pcgdb;
+        private readonly IWebHostEnvironment _hostingEnvironment;
+        private readonly FileService _fileService;
 
-        public UserController(IConfiguration configuration, PCGContext dbContext)
+        public UserController(IConfiguration configuration, PCGContext dbContext, IWebHostEnvironment hostingEnvironment)
         {
             _configuration = configuration;
             con = new SqlConnection(_configuration.GetConnectionString("DefaultConnection"));
-            _dbContext = dbContext;
+            _pcgdb = dbContext;
+            _hostingEnvironment = hostingEnvironment;
+            _fileService = new FileService(Path.Combine(_hostingEnvironment.WebRootPath, "pcgfiles"));
         }
         [ResponseCache(Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Index()
         {
-            if (HttpContext.Session.GetString(SessionType) != "User" && HttpContext.Session.GetString(SessionType) != "SUser")
+            if (HttpContext.Session.GetString(SessionType) != "User" && HttpContext.Session.GetString(SessionType) != "SOM" && HttpContext.Session.GetString(SessionType) != "OM")
             {
                 return RedirectToAction("Login", "Home");
             }
@@ -51,7 +60,8 @@ namespace pcg.Controllers
             ViewData["SessionName"] = HttpContext.Session.GetString(SessionName);
             ViewData["SessionType"] = HttpContext.Session.GetString(SessionType);
 
-            if (HttpContext.Session.GetString(SessionType) == "SUser") {
+            if (HttpContext.Session.GetString(SessionType) == "SOM" || HttpContext.Session.GetString(SessionType) == "OM") 
+            {
                 string sesid = HttpContext.Session.GetString(SessionId);
                 cmd = new SqlCommand("SELECT t.TaskId, " +
                         " t.Task," +
@@ -111,7 +121,7 @@ namespace pcg.Controllers
         }
         public IActionResult ChangeInfo()
         {
-            if (HttpContext.Session.GetString(SessionType) != "User" && HttpContext.Session.GetString(SessionType) != "SUser")
+            if (HttpContext.Session.GetString(SessionType) != "User" && HttpContext.Session.GetString(SessionType) != "SOM" && HttpContext.Session.GetString(SessionType) != "OM")
             {
                 return RedirectToAction("Login", "Home");
             }
@@ -154,7 +164,7 @@ namespace pcg.Controllers
         [HttpPost]
         public IActionResult ChangeInfo(ChangeInfo info)
         {
-            if (HttpContext.Session.GetString(SessionType) != "User" && HttpContext.Session.GetString(SessionType) != "SUser")
+            if (HttpContext.Session.GetString(SessionType) != "User" && HttpContext.Session.GetString(SessionType) != "SOM" && HttpContext.Session.GetString(SessionType) != "OM")
             {
                 return RedirectToAction("Login", "Home");
             }
@@ -209,7 +219,7 @@ namespace pcg.Controllers
         }
         public IActionResult Sites()
         {
-            if (HttpContext.Session.GetString(SessionType) != "User" && HttpContext.Session.GetString(SessionType) != "SUser")
+            if (HttpContext.Session.GetString(SessionType) != "User" && HttpContext.Session.GetString(SessionType) != "SOM" && HttpContext.Session.GetString(SessionType) != "OM")
             {
                 return RedirectToAction("Login", "Home");
             }
@@ -252,7 +262,7 @@ namespace pcg.Controllers
         }
         public IActionResult TaskDetail(string siteId)
         {
-            if (HttpContext.Session.GetString(SessionType) != "User" && HttpContext.Session.GetString(SessionType) != "SUser")
+            if (HttpContext.Session.GetString(SessionType) != "User" && HttpContext.Session.GetString(SessionType) != "SOM" && HttpContext.Session.GetString(SessionType) != "OM")
             {
                 return RedirectToAction("Login", "Home");
             }
@@ -265,7 +275,36 @@ namespace pcg.Controllers
             ViewData["SessionType"] = HttpContext.Session.GetString(SessionType);
             string sesname = HttpContext.Session.GetString(SessionName);
 
-            if (HttpContext.Session.GetString(SessionType) == "SUser") {
+            if (HttpContext.Session.GetString(SessionType) == "SOM") {
+                cmd = new SqlCommand("SELECT t.TaskId," +
+                    " t.Task," +
+                    " t.Description," +
+                    " t.Details," +
+                    " t.AddedBy," +
+                    " t.SiteReqId AS SiteId," +
+                    " t.DateStart," +
+                    " t.DateFwd," +
+                    " t.DateRcv," +
+                    " t.DateClr," +
+                    " t.AssignId," +
+                    " t.ForwardId," +
+                    " t.Status," +
+                    " u.Id AS Id_user, " +
+                    " u.Name AS Name, " +
+                    " u.Position FROM Tasks t " +
+                    "LEFT JOIN Users u " +
+                    "ON t.AssignId = u.Id " +
+                    "WHERE t.SiteReqId = '" + siteId + "' " +
+                    "ORDER BY TaskId DESC", con);
+                DataSet task = new DataSet();
+                SqlDataAdapter tasks = new SqlDataAdapter(cmd);
+                tasks.Fill(task, "slist");
+
+                ViewBag.Tasklog = task.Tables[0];
+            }
+
+            if (HttpContext.Session.GetString(SessionType) == "OM")
+            {
                 cmd = new SqlCommand("SELECT t.TaskId," +
                     " t.Task," +
                     " t.Description," +
@@ -328,10 +367,10 @@ namespace pcg.Controllers
             }
             return View();
         }
-        [HttpPost]
-        public IActionResult AddTask(VariationModel vm)
+        [HttpGet]
+        public IActionResult AddTask(int siteid)
         {
-            if (HttpContext.Session.GetString(SessionType) != "User" && HttpContext.Session.GetString(SessionType) != "SUser")
+            if (HttpContext.Session.GetString(SessionType) != "User" && HttpContext.Session.GetString(SessionType) != "SOM" && HttpContext.Session.GetString(SessionType) != "OM")
             {
                 return RedirectToAction("Login", "Home");
             }
@@ -342,52 +381,92 @@ namespace pcg.Controllers
             ViewBag.Layout = HttpContext.Session.GetString(SessionLayout);
             ViewData["SessionName"] = HttpContext.Session.GetString(SessionName);
             ViewData["SessionType"] = HttpContext.Session.GetString(SessionType);
-            if (HttpContext.Session.GetString(SessionType) == "SUser")
+            ViewData["SiteId"] = siteid;
+
+            cmd = new SqlCommand("SELECT SiteId, Client, Site, SiteOM FROM Sites WHERE SiteId = '" + siteid + "'", con);
+            DataSet sites = new DataSet();
+            SqlDataAdapter ssite = new SqlDataAdapter(cmd);
+            ssite.Fill(sites, "slist");
+
+            ViewBag.Sitelist = sites.Tables[0];
+
+            cmd = new SqlCommand("SELECT u.Id, u.Name, p.Usertype, u.Position FROM Users u LEFT JOIN Positions p ON u.Position = p.Position", con);
+            DataSet user = new DataSet();
+            SqlDataAdapter users = new SqlDataAdapter(cmd);
+            users.Fill(user, "ulist");
+
+            ViewBag.Userlist = user.Tables[0];
+
+            cmd = new SqlCommand("SELECT * FROM Taskprocess", con);
+            DataSet proc = new DataSet();
+            SqlDataAdapter proce = new SqlDataAdapter(cmd);
+            proce.Fill(proc, "ulist");
+
+            ViewBag.Process = proc.Tables[0];
+
+            var vm = new VariationModel
             {
-                if (ModelState.IsValid)
-                {
-                    string sesname = HttpContext.Session.GetString(SessionName);
-                    string desc = vm.Description + " " + vm.Descquery + vm.Descdocreq + vm.Descvary;
-                    string task = vm.Task.Replace("'", "").Replace("\"", "");
-                    string details = vm.Details.Replace("'", "").Replace("\"", "");
+                SiteId = siteid,
+            };
 
-                    DateTime cdt = DateTime.Now;
-                    string scdt = cdt.ToString("yyyy-MM-dd HH:mm:ss");
-
-                    using (cmd = new SqlCommand("INSERT INTO Tasks (Task, Details, Description, AddedBy, SiteReqId, AssignId, Status, Process, Circulation, DateFwd) " +
-                        "VALUES (@Task, @Details, @Description, @AddedBy, @SiteReqId, '0', 'Pre-approve', 'Q1', '0', @DateFwd); SELECT SCOPE_IDENTITY(), Process FROM Tasks WHERE TaskId = SCOPE_IDENTITY();", con))
-                    {
-                        cmd.Parameters.AddWithValue("@Task", task);
-                        cmd.Parameters.AddWithValue("@Details", details);
-                        cmd.Parameters.AddWithValue("@Description", desc);
-                        cmd.Parameters.AddWithValue("@AddedBy", sesname);
-                        cmd.Parameters.AddWithValue("@SiteReqId", vm.SiteReqId);
-                        cmd.Parameters.AddWithValue("@DateFwd", scdt);
-                    }
-                    string taskId;
-                    string proc;
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        reader.Read();
-                        taskId = Convert.ToString(reader[0]);
-                        proc = reader["Process"].ToString();
-                    }
-                    using (cmd = new SqlCommand("INSERT INTO Tasklog (TaskId, AssignId, Status, Process, Task, Details, Circulation, DateFwd) " +
-                        "VALUES (@TaskId, '0', 'Pre-approve', @Process, @Task, @Details, '0', @DateFwd)", con))
-                    {
-                        cmd.Parameters.AddWithValue("@TaskId", taskId);
-                        cmd.Parameters.AddWithValue("@Task", task);
-                        cmd.Parameters.AddWithValue("@Details", details);
-                        cmd.Parameters.AddWithValue("@Process", proc);
-                        cmd.Parameters.AddWithValue("@DateFwd", scdt);
-                    }
-                    cmd.ExecuteNonQuery();
-                }
+            if (con.State == ConnectionState.Open)
+            {
+                con.Close();
             }
-            else
+
+            if (con.State == ConnectionState.Open)
             {
-                if (ModelState.IsValid)
+                con.Close();
+            }
+            return PartialView("actionmodal/_AddTaskPartial", vm);
+        }
+        [HttpPost]
+        public async Task<IActionResult> AddTask(VariationModel vm, int siteid)
+        {
+            if (HttpContext.Session.GetString(SessionType) != "User" && HttpContext.Session.GetString(SessionType) != "SOM" && HttpContext.Session.GetString(SessionType) != "OM")
+            {
+                return RedirectToAction("Login", "Home");
+            }
+            if (con.State == ConnectionState.Closed)
+            {
+                con.Open();
+            }
+            ViewBag.Layout = HttpContext.Session.GetString(SessionLayout);
+            ViewData["SessionName"] = HttpContext.Session.GetString(SessionName);
+            ViewData["SessionType"] = HttpContext.Session.GetString(SessionType);
+            ViewData["SiteId"] = siteid;
+
+            cmd = new SqlCommand("SELECT SiteId, Client, Site, SiteOM FROM Sites WHERE SiteId = '" + siteid + "'", con);
+            DataSet sites = new DataSet();
+            SqlDataAdapter ssite = new SqlDataAdapter(cmd);
+            ssite.Fill(sites, "slist");
+
+            ViewBag.Sitelist = sites.Tables[0];
+
+            cmd = new SqlCommand("SELECT u.Id, u.Name, p.Usertype, u.Position FROM Users u LEFT JOIN Positions p ON u.Position = p.Position", con);
+            DataSet user = new DataSet();
+            SqlDataAdapter users = new SqlDataAdapter(cmd);
+            users.Fill(user, "ulist");
+
+            ViewBag.Userlist = user.Tables[0];
+
+            cmd = new SqlCommand("SELECT * FROM Taskprocess", con);
+            DataSet proc = new DataSet();
+            SqlDataAdapter proce = new SqlDataAdapter(cmd);
+            proce.Fill(proc, "ulist");
+
+            ViewBag.Process = proc.Tables[0];
+
+            if (ModelState.IsValid)
+            {
+                if (HttpContext.Session.GetString(SessionType) == "SUser")
                 {
+                    var (filePath, rawfilename, errorMessage) = await _fileService.UploadFileAsync(vm.UploadFile, "tba");
+                    if (errorMessage != null)
+                    {
+                        ModelState.AddModelError("UploadFile", errorMessage);
+                        return PartialView("actionmodal/_AddTaskPartial", vm);
+                    }
                     string sesname = HttpContext.Session.GetString(SessionName);
                     string desc = vm.Description + " " + vm.Descquery + vm.Descdocreq + vm.Descvary;
                     string task = vm.Task.Replace("'", "").Replace("\"", "");
@@ -395,45 +474,193 @@ namespace pcg.Controllers
 
                     DateTime cdt = DateTime.Now;
                     string scdt = cdt.ToString("yyyy-MM-dd HH:mm:ss");
-                    using (cmd = new SqlCommand("INSERT INTO Tasks (Task, Details, Description, AddedBy, SiteReqId, AssignId, Status, Process, Circulation, DateFwd) " +
-                        "VALUES (@Task, @Details, @Description, @AddedBy, @SiteReqId, '0', 'Pre-request', 'Q1', '0', @DateFwd); SELECT SCOPE_IDENTITY(), Process FROM Tasks WHERE TaskId = SCOPE_IDENTITY();", con))
+                    using (cmd = new SqlCommand("INSERT INTO Tasks (Task, Details, Description, AddedBy, SiteReqId, AssignId, Status, DateStart, Process, Circulation, TaskType) VALUES" +
+                        "(@Task, " +
+                        "@Details, " +
+                        "@Desc, " +
+                        "@Sesname, " +
+                        "@SiteReqId, " +
+                        "@AssignId, " +
+                        "'Approved', " +
+                        "@Scdt, " +
+                        "'Q1', " +
+                        "'0', " +
+                        "@TaskType); SELECT SCOPE_IDENTITY(), Process FROM Tasks WHERE TaskId = SCOPE_IDENTITY();", con))
                     {
                         cmd.Parameters.AddWithValue("@Task", task);
                         cmd.Parameters.AddWithValue("@Details", details);
-                        cmd.Parameters.AddWithValue("@Description", desc);
-                        cmd.Parameters.AddWithValue("@AddedBy", sesname);
-                        cmd.Parameters.AddWithValue("@SiteReqId", vm.SiteReqId);
-                        cmd.Parameters.AddWithValue("@DateFwd", scdt);
+                        cmd.Parameters.AddWithValue("@Desc", desc);
+                        cmd.Parameters.AddWithValue("@Sesname", sesname);
+                        cmd.Parameters.AddWithValue("@SiteReqId", siteid);
+                        cmd.Parameters.AddWithValue("@AssignId", "0");
+                        cmd.Parameters.AddWithValue("@Scdt", scdt);
+                        cmd.Parameters.AddWithValue("@TaskType", vm.Description);
                     }
+
                     string taskId;
-                    string proc;
+                    string process;
                     using (SqlDataReader reader = cmd.ExecuteReader())
                     {
                         reader.Read();
                         taskId = Convert.ToString(reader[0]);
-                        proc = reader["Process"].ToString();
+                        process = reader["Process"].ToString();
                     }
-                    using (cmd = new SqlCommand("INSERT INTO Tasklog (TaskId, AssignId, Status, Process, Task, Details, Circulation, DateFwd) " +
-                        "VALUES (@TaskId, '0', 'Pre-request', @Process, @Task, @Details, '0', @DateFwd)", con))
+
+                    int filecount = 1;
+                    string addedby = HttpContext.Session.GetString(SessionId);
+                    string datePart = "(" + DateTime.Now.ToString("MMddyy") + ")";
+                    var fileExtension = Path.GetExtension(rawfilename);
+                    string newname = "_" + taskId + "_" + addedby + "_" + filecount;
+
+                    var renamefile = await _fileService.RenameFileAsync(rawfilename, newname);
+
+                    if (!renamefile.Success)
+                    {
+                        ModelState.AddModelError("UploadFile", "Error renaming");
+                        return PartialView("actionmodal/_AddTaskPartial", vm);
+                    }
+
+                    DateTime fdt = DateTime.ParseExact(DateTime.Now.ToString("MM-dd-yyyy HH:mm:ss"), "MM-dd-yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+                    string fname = rawfilename;
+
+                    var pcgFile = new Files
+                    {
+                        FileName = datePart + newname + fileExtension,
+                        FileAlias = vm.FileAlias,
+                        TaskId = int.Parse(taskId),
+                        Status = "Active",
+                        AddedBy = int.Parse(addedby),
+                        DateAdded = fdt
+                    };
+                    _pcgdb.Files.Add(pcgFile);
+                    _pcgdb.SaveChanges();
+
+                    using (cmd = new SqlCommand("INSERT INTO Tasklog (TaskId, AssignId, DateStart, Status, Process, Task, Details, Circulation) " +
+                        "VALUES (@TaskId, " +
+                        "@AssignId, " +
+                        "@DateStart, " +
+                        "'Pre-approve', " +
+                        "@Process, " +
+                        "@Task, " +
+                        "@Details, " +
+                        "'0')", con))
                     {
                         cmd.Parameters.AddWithValue("@TaskId", taskId);
+                        cmd.Parameters.AddWithValue("@AssignId", "");
+                        cmd.Parameters.AddWithValue("@DateStart", scdt);
+                        cmd.Parameters.AddWithValue("@Process", process);
                         cmd.Parameters.AddWithValue("@Task", task);
                         cmd.Parameters.AddWithValue("@Details", details);
-                        cmd.Parameters.AddWithValue("@Process", proc);
-                        cmd.Parameters.AddWithValue("@DateFwd", scdt);
                     }
                     cmd.ExecuteNonQuery();
                 }
+                else
+                {
+                    var (filePath, rawfilename, errorMessage) = await _fileService.UploadFileAsync(vm.UploadFile, "tba");
+                    if (errorMessage != null)
+                    {
+                        ModelState.AddModelError("UploadFile", errorMessage);
+                        return PartialView("actionmodal/_AddTaskPartial", vm);
+                    }
+                    string sesname = HttpContext.Session.GetString(SessionName);
+                    string desc = vm.Description + " " + vm.Descquery + vm.Descdocreq + vm.Descvary;
+                    string task = vm.Task.Replace("'", "").Replace("\"", "");
+                    string details = vm.Details.Replace("'", "").Replace("\"", "");
+
+                    DateTime cdt = DateTime.Now;
+                    string scdt = cdt.ToString("yyyy-MM-dd HH:mm:ss");
+                    using (cmd = new SqlCommand("INSERT INTO Tasks (Task, Details, Description, AddedBy, SiteReqId, AssignId, Status, DateStart, Process, Circulation, TaskType) VALUES" +
+                        "(@Task, " +
+                        "@Details, " +
+                        "@Desc, " +
+                        "@Sesname, " +
+                        "@SiteReqId, " +
+                        "@AssignId, " +
+                        "'Pre-request', " +
+                        "@Scdt, " +
+                        "'Q1', " +
+                        "'0', " +
+                        "@TaskType); SELECT SCOPE_IDENTITY(), Process FROM Tasks WHERE TaskId = SCOPE_IDENTITY();", con))
+                    {
+                        cmd.Parameters.AddWithValue("@Task", task);
+                        cmd.Parameters.AddWithValue("@Details", details);
+                        cmd.Parameters.AddWithValue("@Desc", desc);
+                        cmd.Parameters.AddWithValue("@Sesname", sesname);
+                        cmd.Parameters.AddWithValue("@SiteReqId", siteid);
+                        cmd.Parameters.AddWithValue("@AssignId", "0");
+                        cmd.Parameters.AddWithValue("@Scdt", scdt);
+                        cmd.Parameters.AddWithValue("@TaskType", vm.Description);
+                    }
+
+                    string taskId;
+                    string process;
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        reader.Read();
+                        taskId = Convert.ToString(reader[0]);
+                        process = reader["Process"].ToString();
+                    }
+
+                    int filecount = 1;
+                    string addedby = HttpContext.Session.GetString(SessionId);
+                    string datePart = "(" + DateTime.Now.ToString("MMddyy") + ")";
+                    var fileExtension = Path.GetExtension(rawfilename);
+                    string newname = "_" + taskId + "_" + addedby + "_" + filecount;
+
+                    var renamefile = await _fileService.RenameFileAsync(rawfilename, newname);
+
+                    if (!renamefile.Success)
+                    {
+                        ModelState.AddModelError("UploadFile", "Error renaming");
+                        return PartialView("actionmodal/_AddTaskPartial", vm);
+                    }
+
+                    DateTime fdt = DateTime.ParseExact(DateTime.Now.ToString("MM-dd-yyyy HH:mm:ss"), "MM-dd-yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+                    string fname = rawfilename;
+
+                    var pcgFile = new Files
+                    {
+                        FileName = datePart + newname + fileExtension,
+                        FileAlias = vm.FileAlias,
+                        TaskId = int.Parse(taskId),
+                        Status = "Active",
+                        AddedBy = int.Parse(addedby),
+                        DateAdded = fdt
+                    };
+                    _pcgdb.Files.Add(pcgFile);
+                    _pcgdb.SaveChanges();
+
+                    using (cmd = new SqlCommand("INSERT INTO Tasklog (TaskId, AssignId, DateStart, Status, Process, Task, Details, Circulation) " +
+                        "VALUES (@TaskId, " +
+                        "@AssignId, " +
+                        "@DateStart, " +
+                        "'Pre-request', " +
+                        "@Process, " +
+                        "@Task, " +
+                        "@Details, " +
+                        "'0')", con))
+                    {
+                        cmd.Parameters.AddWithValue("@TaskId", taskId);
+                        cmd.Parameters.AddWithValue("@AssignId", "");
+                        cmd.Parameters.AddWithValue("@DateStart", scdt);
+                        cmd.Parameters.AddWithValue("@Process", process);
+                        cmd.Parameters.AddWithValue("@Task", task);
+                        cmd.Parameters.AddWithValue("@Details", details);
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+                ViewBag.SuccessMessage = "Task added.";
+                return PartialView("actionmodal/_AddTaskPartial", vm);
             }
             if (con.State == ConnectionState.Open)
             {
                 con.Close();
             }
-            return RedirectToAction("Sites", "User");
+            return PartialView("actionmodal/_AddTaskPartial", vm);
         }
         public IActionResult Pending()
         {
-            if (HttpContext.Session.GetString(SessionType) != "SUser")
+            if (HttpContext.Session.GetString(SessionType) != "SOM" && HttpContext.Session.GetString(SessionType) != "OM")
             {
                 return RedirectToAction("Login", "Home");
             }
@@ -445,54 +672,108 @@ namespace pcg.Controllers
             ViewData["SessionName"] = HttpContext.Session.GetString(SessionName);
             ViewData["SessionType"] = HttpContext.Session.GetString(SessionType);
             string sesid = HttpContext.Session.GetString(SessionId);
-            cmd = new SqlCommand("SELECT t.TaskId, " +
-                    " t.Task," +
-                    " t.Description," +
-                    " t.Details," +
-                    " t.AddedBy," +
-                    " t.SiteReqId," +
-                    " t.DateStart," +
-                    " t.DateFwd," +
-                    " t.DateRcv," +
-                    " t.DateClr," +
-                    " t.AssignId," +
-                    " t.ForwardId," +
-                    " t.Status," +
-                    " p.Code," +
-                    " s.Client," +
-                    " s.Site," +
-                    " s.SiteOM," +
-                    " s.SiteSOM," +
-                    " s.SiteSC," +
-                    " s.SiteTK," +
-                    " uf.Id AS Idf," +
-                    " uf.Name AS Namef, " +
-                    " uf.Position As Positionf, " +
-                    " ua.Id AS Ida, " +
-                    " ua.Name AS Namea, " +
-                    " ua.Position AS Positiona, " +
-                    " pf.UserType AS UserTypepf, " +
-                    " pa.UserType As UserTypepa " +
-                    "FROM Tasks t " +
-                    "LEFT JOIN Users uf " +
-                    "ON t.ForwardId = uf.Id " +
-                    "LEFT JOIN Positions pf " +
-                    "ON uf.Position = pf.Position " +
-                    "LEFT JOIN Users ua " +
-                    "ON t.AssignId = ua.Id " +
-                    "LEFT JOIN Positions pa " +
-                    "ON ua.Position = pa.Position " +
-                    "LEFT JOIN Sites s " +
-                    "ON t.SiteReqId = s.SiteId " +
-                    "LEFT JOIN Taskprocess p " +
-                    "ON t.Process = p.Code " +
-                    "WHERE t.Status = 'Pre-request' AND (s.SiteOM = '" + sesid + "' OR s.SiteSOM = '" + sesid + "' OR s.SiteSC = '" + sesid + "' OR s.SiteTK = '" + sesid + "') " +
-                    "ORDER BY t.TaskId DESC", con);
-            DataSet task = new DataSet();
-            SqlDataAdapter tasks = new SqlDataAdapter(cmd);
-            tasks.Fill(task, "tlist");
+            if (HttpContext.Session.GetString(SessionType) == "OM")
+            {
+                cmd = new SqlCommand("SELECT t.TaskId, " +
+                        " t.Task," +
+                        " t.Description," +
+                        " t.Details," +
+                        " t.AddedBy," +
+                        " t.SiteReqId," +
+                        " t.DateStart," +
+                        " t.DateFwd," +
+                        " t.DateRcv," +
+                        " t.DateClr," +
+                        " t.AssignId," +
+                        " t.ForwardId," +
+                        " t.Status," +
+                        " p.Code," +
+                        " s.Client," +
+                        " s.Site," +
+                        " s.SiteOM," +
+                        " s.SiteSOM," +
+                        " s.SiteSC," +
+                        " s.SiteTK," +
+                        " uf.Id AS Idf," +
+                        " uf.Name AS Namef, " +
+                        " uf.Position As Positionf, " +
+                        " ua.Id AS Ida, " +
+                        " ua.Name AS Namea, " +
+                        " ua.Position AS Positiona, " +
+                        " pf.UserType AS UserTypepf, " +
+                        " pa.UserType As UserTypepa " +
+                        "FROM Tasks t " +
+                        "LEFT JOIN Users uf " +
+                        "ON t.ForwardId = uf.Id " +
+                        "LEFT JOIN Positions pf " +
+                        "ON uf.Position = pf.Position " +
+                        "LEFT JOIN Users ua " +
+                        "ON t.AssignId = ua.Id " +
+                        "LEFT JOIN Positions pa " +
+                        "ON ua.Position = pa.Position " +
+                        "LEFT JOIN Sites s " +
+                        "ON t.SiteReqId = s.SiteId " +
+                        "LEFT JOIN Taskprocess p " +
+                        "ON t.Process = p.Code " +
+                        "WHERE t.Status = 'Pre-request' AND (s.SiteOM = '" + sesid + "') " +
+                        "ORDER BY t.TaskId DESC", con);
+                DataSet task = new DataSet();
+                SqlDataAdapter tasks = new SqlDataAdapter(cmd);
+                tasks.Fill(task, "tlist");
 
-            ViewBag.Pending = task.Tables[0];
+                ViewBag.Pending = task.Tables[0];
+            }
+            if (HttpContext.Session.GetString(SessionType) == "SOM")
+            {
+                cmd = new SqlCommand("SELECT t.TaskId, " +
+                        " t.Task," +
+                        " t.Description," +
+                        " t.Details," +
+                        " t.AddedBy," +
+                        " t.SiteReqId," +
+                        " t.DateStart," +
+                        " t.DateFwd," +
+                        " t.DateRcv," +
+                        " t.DateClr," +
+                        " t.AssignId," +
+                        " t.ForwardId," +
+                        " t.Status," +
+                        " p.Code," +
+                        " s.Client," +
+                        " s.Site," +
+                        " s.SiteOM," +
+                        " s.SiteSOM," +
+                        " s.SiteSC," +
+                        " s.SiteTK," +
+                        " uf.Id AS Idf," +
+                        " uf.Name AS Namef, " +
+                        " uf.Position As Positionf, " +
+                        " ua.Id AS Ida, " +
+                        " ua.Name AS Namea, " +
+                        " ua.Position AS Positiona, " +
+                        " pf.UserType AS UserTypepf, " +
+                        " pa.UserType As UserTypepa " +
+                        "FROM Tasks t " +
+                        "LEFT JOIN Users uf " +
+                        "ON t.ForwardId = uf.Id " +
+                        "LEFT JOIN Positions pf " +
+                        "ON uf.Position = pf.Position " +
+                        "LEFT JOIN Users ua " +
+                        "ON t.AssignId = ua.Id " +
+                        "LEFT JOIN Positions pa " +
+                        "ON ua.Position = pa.Position " +
+                        "LEFT JOIN Sites s " +
+                        "ON t.SiteReqId = s.SiteId " +
+                        "LEFT JOIN Taskprocess p " +
+                        "ON t.Process = p.Code " +
+                        "WHERE t.Status = 'OM-approve' AND (s.SiteSOM = '" + sesid + "') " +
+                        "ORDER BY t.TaskId DESC", con);
+                DataSet task = new DataSet();
+                SqlDataAdapter tasks = new SqlDataAdapter(cmd);
+                tasks.Fill(task, "tlist");
+
+                ViewBag.Pending = task.Tables[0];
+            }
             if (con.State == ConnectionState.Open)
             {
                 con.Close();
@@ -502,7 +783,7 @@ namespace pcg.Controllers
         [HttpPost]
         public IActionResult Approve(ProcessModel pm)
         {
-            if (HttpContext.Session.GetString(SessionType) != "SUser")
+            if (HttpContext.Session.GetString(SessionType) != "SOM" && HttpContext.Session.GetString(SessionType) != "OM")
             {
                 return RedirectToAction("Login", "Home");
             }
@@ -516,42 +797,70 @@ namespace pcg.Controllers
 
             DateTime cdt = DateTime.Now;
             string scdt = cdt.ToString("yyyy-MM-dd HH:mm:ss");
-
-            using (cmd = new SqlCommand("UPDATE Tasks SET " +
-                "Task = @Task, " +
-                "Details = @Details, " +
-                "Process = @Process, " +
-                "Status = 'Pre-approve' " +
-                "WHERE TaskId = @TaskId", con))
+            if (HttpContext.Session.GetString(SessionType) == "SOM") 
             {
-                cmd.Parameters.AddWithValue("@TaskId", pm.TaskId);
-                cmd.Parameters.AddWithValue("@Task", pm.Task);
-                cmd.Parameters.AddWithValue("@Details", pm.Details);
-                cmd.Parameters.AddWithValue("@Process", pm.Process);
-            }
-            cmd.ExecuteNonQuery();
-
-            using (cmd = new SqlCommand("INSERT INTO Tasklog (TaskId, AssignId, DateFwd, Status, Process, Task, Details, Circulation) " +
-                "VALUES (@TaskId, '0', @DateFwd, 'Pre-approve', @Process, @Task, @Details, '0')", con))
-            {
-                cmd.Parameters.AddWithValue("@TaskId", pm.TaskId);
-                cmd.Parameters.AddWithValue("@DateFwd", scdt);
-                cmd.Parameters.AddWithValue("@Task", pm.Task);
-                cmd.Parameters.AddWithValue("@Details", pm.Details);
-                cmd.Parameters.AddWithValue("@Process", pm.Process);
-            }
-            cmd.ExecuteNonQuery();
-
-            if (con.State == ConnectionState.Open)
+                using (cmd = new SqlCommand("UPDATE Tasks SET " +
+                    "Task = @Task, " +
+                    "Details = @Details, " +
+                    "Process = @Process, " +
+                    "Status = 'SOM-approve' " +
+                    "WHERE TaskId = @TaskId", con))
                 {
-                    con.Close();
+                    cmd.Parameters.AddWithValue("@TaskId", pm.TaskId);
+                    cmd.Parameters.AddWithValue("@Task", pm.Task);
+                    cmd.Parameters.AddWithValue("@Details", pm.Details);
+                    cmd.Parameters.AddWithValue("@Process", pm.Process);
                 }
+                cmd.ExecuteNonQuery();
+
+                using (cmd = new SqlCommand("INSERT INTO Tasklog (TaskId, AssignId, DateFwd, Status, Process, Task, Details, Circulation) " +
+                    "VALUES (@TaskId, '0', @DateFwd, 'Pre-approve', @Process, @Task, @Details, '0')", con))
+                {
+                    cmd.Parameters.AddWithValue("@TaskId", pm.TaskId);
+                    cmd.Parameters.AddWithValue("@DateFwd", scdt);
+                    cmd.Parameters.AddWithValue("@Task", pm.Task);
+                    cmd.Parameters.AddWithValue("@Details", pm.Details);
+                    cmd.Parameters.AddWithValue("@Process", pm.Process);
+                }
+                cmd.ExecuteNonQuery();
+            }
+            if (HttpContext.Session.GetString(SessionType) == "OM")
+            {
+                using (cmd = new SqlCommand("UPDATE Tasks SET " +
+                    "Task = @Task, " +
+                    "Details = @Details, " +
+                    "Process = @Process, " +
+                    "Status = 'OM-approve' " +
+                    "WHERE TaskId = @TaskId", con))
+                {
+                    cmd.Parameters.AddWithValue("@TaskId", pm.TaskId);
+                    cmd.Parameters.AddWithValue("@Task", pm.Task);
+                    cmd.Parameters.AddWithValue("@Details", pm.Details);
+                    cmd.Parameters.AddWithValue("@Process", pm.Process);
+                }
+                cmd.ExecuteNonQuery();
+
+                using (cmd = new SqlCommand("INSERT INTO Tasklog (TaskId, AssignId, DateFwd, Status, Process, Task, Details, Circulation) " +
+                    "VALUES (@TaskId, '0', @DateFwd, 'Pre-approve', @Process, @Task, @Details, '0')", con))
+                {
+                    cmd.Parameters.AddWithValue("@TaskId", pm.TaskId);
+                    cmd.Parameters.AddWithValue("@DateFwd", scdt);
+                    cmd.Parameters.AddWithValue("@Task", pm.Task);
+                    cmd.Parameters.AddWithValue("@Details", pm.Details);
+                    cmd.Parameters.AddWithValue("@Process", pm.Process);
+                }
+                cmd.ExecuteNonQuery();
+            }
+            if (con.State == ConnectionState.Open)
+            {
+                con.Close();
+            }
             return RedirectToAction("Pending", "User");
         }
         [HttpPost]
         public IActionResult Decline(ProcessModel pm)
         {
-            if (HttpContext.Session.GetString(SessionType) != "SUser")
+            if (HttpContext.Session.GetString(SessionType) != "SOM" && HttpContext.Session.GetString(SessionType) != "OM")
             {
                 return RedirectToAction("Login", "Home");
             }
@@ -583,7 +892,7 @@ namespace pcg.Controllers
             cmd.ExecuteNonQuery();
 
             using (cmd = new SqlCommand("INSERT INTO Tasklog (TaskId, AssignId, DateClr, Status, Process, Task, Details, Circulation) " +
-                "VALUES (@TaskId, @AssignId, @DateClr, 'Pre-approve', @Process, @Task, @Details, '0')", con))
+                "VALUES (@TaskId, @AssignId, @DateClr, 'Declined', @Process, @Task, @Details, '0')", con))
             {
                 cmd.Parameters.AddWithValue("@TaskId", pm.TaskId);
                 cmd.Parameters.AddWithValue("@AssignId", pm.AssignId);
@@ -602,7 +911,7 @@ namespace pcg.Controllers
         }
         public IActionResult MyTask()
         {
-            if (HttpContext.Session.GetString(SessionType) != "User" && HttpContext.Session.GetString(SessionType) != "SUser")
+            if (HttpContext.Session.GetString(SessionType) != "User" && HttpContext.Session.GetString(SessionType) != "SOM" && HttpContext.Session.GetString(SessionType) != "OM")
             {
                 return RedirectToAction("Login", "Home");
             }
@@ -678,7 +987,7 @@ namespace pcg.Controllers
         [HttpPost]
         public IActionResult Recieve(ProcessModel pm)
         {
-            if (HttpContext.Session.GetString(SessionType) != "User" && HttpContext.Session.GetString(SessionType) != "SUser")
+            if (HttpContext.Session.GetString(SessionType) != "User" && HttpContext.Session.GetString(SessionType) != "SOM" && HttpContext.Session.GetString(SessionType) != "OM")
             {
                 return RedirectToAction("Login", "Home");
             }

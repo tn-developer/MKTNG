@@ -489,6 +489,8 @@ namespace pcg.Controllers
 
                     int filecount = 1;
                     string addedby = HttpContext.Session.GetString(SessionId);
+                    string datePart = "(" + DateTime.Now.ToString("MMddyy") + ")";
+                    var fileExtension = Path.GetExtension(rawfilename);
                     string newname = "_" + taskId + "_" + addedby + "_" + filecount;
 
                     var renamefile = await _fileService.RenameFileAsync(rawfilename, newname);
@@ -504,7 +506,7 @@ namespace pcg.Controllers
 
                     var pcgFile = new Files
                     {
-                        FileName = newname,
+                        FileName = datePart + newname + fileExtension,
                         FileAlias = vars.FileAlias,
                         TaskId = int.Parse(taskId),
                         Status = "Active",
@@ -590,6 +592,8 @@ namespace pcg.Controllers
 
                     int filecount = 1;
                     string addedby = HttpContext.Session.GetString(SessionId);
+                    string datePart = "(" + DateTime.Now.ToString("MMddyy") + ")";
+                    var fileExtension = Path.GetExtension(rawfilename);
                     string newname = "_" + taskId + "_" + addedby + "_" + filecount;
 
                     var renamefile = await _fileService.RenameFileAsync(rawfilename, newname);
@@ -605,7 +609,7 @@ namespace pcg.Controllers
 
                     var pcgFile = new Files
                     {
-                        FileName = newname,
+                        FileName = datePart + newname + fileExtension,
                         FileAlias = vars.FileAlias,
                         TaskId = int.Parse(taskId),
                         Status = "Active",
@@ -881,7 +885,7 @@ namespace pcg.Controllers
                     "ON t.SiteReqId = s.SiteId " +
                     "LEFT JOIN Taskprocess p " +
                     "ON t.Process = p.Code " +
-                    "WHERE t.Status = 'Waiting' OR t.Status = 'Pre-approve' " +
+                    "WHERE t.Status = 'Waiting' OR t.Status = 'SOM-approve' " +
                     "ORDER BY TaskId DESC", con);
                 DataSet task = new DataSet();
                 SqlDataAdapter tasks = new SqlDataAdapter(cmd);

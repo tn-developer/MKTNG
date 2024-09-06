@@ -40,7 +40,7 @@
                 <td class="text-center text-nowrap">@dr["DateStart"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["Namea"].ToString()</td>
                 <td>
-                    @if (dr["Status"].ToString() == "Pre-request")
+                    @if (dr["Status"].ToString() == "Pre-request" || dr["Status"].ToString() == "OM-approve")
                     {
                         <div class="modal fade" id="Approve_@dr["TaskId"]" tabindex="-1" role="dialog" aria-labelledby="ApproveModalLabel_@dr["TaskId"]" aria-hidden="true">
                             <div class="modal-dialog" role="document">

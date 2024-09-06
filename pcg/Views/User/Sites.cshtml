@@ -7,8 +7,9 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap5.min.css">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap5.css">
+    <link rel="stylesheet" href="~/css/custom.css" />
 </head>
 <div>
 <h1 style="text-align:center">Sites</h1>
@@ -25,151 +26,145 @@
     <tbody id="myTable">
         @foreach (System.Data.DataRow dr in ViewBag.Sitelist.Rows)
         {
-        <tr>
+            <tr>
                 <td class="text-center text-nowrap">@dr["Client"].ToString() @dr["Site"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["OMName"].ToString()@dr["SOMName"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["SCName"].ToString()@dr["TKName"].ToString()</td>
-            <td class="text-center text-nowrap">
-                    <div class="modal fade" id="AddTask_@dr["SiteId"].ToString()" tabindex="-1" aria-labelledby="AddTaskModalLabel" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="modal-content">
-                                <div class="modal-header">
-                                    <h5 class="modal-title" id="AddTaskModalLabel">Add Site</h5>
-                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                </div>
-                                <div class="modal-body">
-                                    <p>Add Task for @dr["SiteId"].ToString(): @dr["Client"].ToString() @dr["Site"].ToString() </p>
-                                    <div class="col-md-12">
-                                        <form asp-action="AddTask">
-                                            <div asp-validation-summary="All" class="text-danger"></div>
-                                            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                                                <div class="form-group">
-                                                    <label asp-for="Task" class="control-label">Task</label>
-                                                    <input asp-for="Task" class="form-control"/>
-                                                </div>                      
-                                                <div class="form-group">
-                                                    <label asp-for="Details" class="control-label">Details</label>
-                                                    <textarea asp-for="Details" class="form-control"></textarea>                                                
-                                                </div>
-                                                <div class="form-group">
-                                                    <label asp-for="Description" class="control-label"></label>
-                                                <select id="desc_@dr["SiteId"].ToString()" asp-for="Description" class="form-control" onchange="showoptions(@dr["SiteId"].ToString())">
-                                                    <option value="Query" selected>Query</option>
-                                                    <option value="Variation">Variation</option>
-                                                    <option value="Document Request">Document Request</option>
-                                                </select>
-                                                </div>
-                                            <div id="query_@dr["SiteId"].ToString()" class="form-group" style="display: block;">
-                                                <label for="queryoption_@dr["SiteId"].ToString()" asp-for="Descquery" class="control-label">Query</label>
-                                                <select id="queryoption_@dr["SiteId"].ToString()" asp-for="Descquery" class="form-control">
-                                                    <option value="Plan">Plan</option>
-                                                    <option value="Contract/Billing">Contract/Billing</option>
-                                                    <option value="Schedule">Schedule</option>
-                                                    <option value="Finishing">Finishing</option>
-                                                </select>
-                                                </div>
-                                            <div id="vary_@dr["SiteId"].ToString()" class="form-group" style="display: none;">
-                                                    <label for="varyoption" asp-for="Descvary" class="control-label">Variation</label>
-                                                <select id="varyoption_@dr["SiteId"].ToString()" asp-for="Descvary" class="form-control">
-                                                    <option value="Owner's Instruction">Owner's Instruction</option>
-                                                    <option value="Subcon">Subcon</option>                           
-                                                </select>
-                                            </div>
-                                            <div id="docreq_@dr["SiteId"].ToString()" class="form-group" style="display: none;">
-                                                <label for="docreqoption_@dr["SiteId"].ToString()" asp-for="Descdocreq" class="control-label">Document Request</label>
-                                                <select id="docreqoption_@dr["SiteId"].ToString()" asp-for="Descdocreq" class="form-control">
-                                                    <option value="Plan">Plan</option>
-                                                    <option value="Contract">Contract</option>
-                                                    <option value="Schedule">Schedule</option>
-                                                    <option value="Finishing">Finishing</option>
-                                                </select>
-                                            </div>                                            
-                                            <div class="modal-footer">
-                                                <input type="hidden" asp-for="SiteReqId" value="@dr["SiteId"].ToString()" />
-                                                <button type="button" class="btn btn-primary" onclick="confirmAddTask('@dr["SiteId"].ToString()')">Confirm</button>
-                                                <button type="button" class="btn btn-secondary" onclick="closeAddTask('@dr["SiteId"].ToString()')">Cancel</button>
-                                            </div>
-                                        </form>
-                                     </div>
-                                </div>
-                            </div>
-                        </div>
+                <td class="text-center text-nowrap">
+                    <div style="text-align:center">
+                        <a href="@Url.Action("TaskDetail", "User", new { siteId = dr["SiteId"] })">Task Details</a> |
+@*                         <a href="#" onclick="preload(@dr["SiteId"].ToString())" data-bs-toggle="modal" data-bs-target="#addTaskModal">Add Task</a>*@
+                        <a href="#" id="addTask_@dr["SiteId"].ToString()" data-siteId="@dr["SiteId"].ToString()" data-bs-toggle="modal" data-bs-target="#addTaskModal_@dr["SiteId"].ToString()">Add Task</a>
                     </div>
-
-                <div style="text-align:center">
-                    <a href="@Url.Action("TaskDetail", "User", new { siteId = dr["SiteId"] })">Task Details</a> |
-                        <a href="#" onclick="preload(@dr["SiteId"].ToString())" data-bs-toggle="modal" data-bs-target="#AddTask_@dr["SiteId"].ToString()">Add Task</a>
-                </div>
-            </td>
-        </tr>
+                </td>
+            </tr>
         }
     </tbody>
 </table>
 
+<div class="modal fade" id="addTaskModal" tabindex="-1" aria-labelledby="addTaskModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addTaskModalLabel">Add Task</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div id="addTaskModalBody">
+                <!-- Content will be loaded here dynamically -->
+            </div>            
+        </div>
+    </div>
+</div>
+
 @section scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.7/umd/popper.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js"></script>
     <script>
-        function openAddTask(siteId) {
-            $('#AddTask_' + siteId).modal('show');
-        }
-        function closeAddTask(siteId) {
-            $('#AddTask_' + siteId).modal('hide');
-        }
-        function confirmAddTask(siteId) {
-            $('#AddTask_' + siteId).modal('hide');
-            var form = $('#AddTask_' + siteId).find('form');
-            form.submit();
-        }
+        document.addEventListener('DOMContentLoaded', function () {
+            function updateAddTaskFileIcon() {
+                const fileInput = document.getElementById('addTaskFile');
+                const file = fileInput.files[0];
+                const fileType = file ? file.name.split('.').pop().toLowerCase() : 'default';
+                const fileIcon = document.getElementById('fileIcon');
 
-        function preload(siteId) {
-            document.getElementById("queryoption_" + siteId).value = "Plan";
-            document.getElementById("docreqoption_" + siteId).value = "";
-            document.getElementById("varyoption_" + siteId).value = "";
-        }
+                const fileTypeIcons = {
+                    'pdf': '/images/icons/pdf.png',
+                    'doc': '/images/icons/docs.png',
+                    'docx': '/images/icons/docs.png',
+                    'txt': '/images/icons/txtfile.png',
+                    'jpg': '/images/icons/camerafile.png',
+                    'jpeg': '/images/icons/camerafile.png',
+                    'png': '/images/icons/camerafile.png',
+                    'xls': '/images/icons/excelfile.png',
+                    'xlsx': '/images/icons/excelfile.png',
+                    'ppt': '/images/icons/pptfile.png',
+                    'pptx': '/images/icons/pptfile.png',
+                    'unknown': '/images/icons/unsupportedfile.png',
+                    'default': '/images/icons/uploadfile.png'
+                };
 
-        function showoptions(siteId) {
-            var desc = document.getElementById("desc_" + siteId).value;
-            var queryDiv = document.getElementById("query_" + siteId);
-            var queryOption = document.getElementById("queryoption_" + siteId);
-            var docreqDiv = document.getElementById("docreq_" + siteId);
-            var docreqOption = document.getElementById("docreqoption_" + siteId);
-            var varyDiv = document.getElementById("vary_" + siteId);
-            var varyOption = document.getElementById("varyoption_" + siteId);            
+                const iconSrc = fileTypeIcons[fileType] || fileTypeIcons['unknown'];
+                if (fileIcon) {
+                    fileIcon.src = iconSrc;
+                }
+            }
 
-            if (desc === "Query") {
-                queryDiv.style.display = "block";
-                queryOption.value = "Plan";
-                docreqDiv.style.display = "none";
-                docreqOption.value = "";
-                varyDiv.style.display = "none";
-                varyOption.value = "";
+            function resetAddTaskFileInputAndIcon() {
+                const fileIcon = document.getElementById('addTaskFileIcon');
+                const fileInput = document.getElementById('addTaskFile');
+
+                if (fileIcon) {
+                    fileIcon.src = '/images/icons/uploadfile.png';
+                }
+                if (fileInput) {
+                    fileInput.value = '';
+                    const event = new Event('change');
+                    fileInput.dispatchEvent(event);
+                }
             }
-            else if (desc === "Document Request") {
-                docreqDiv.style.display = "block";
-                docreqOption.value = "Plan";
-                queryDiv.style.display = "none";
-                queryOption.value = "";
-                varyDiv.style.display = "none";
-                varyOption.value = "";
-            }
-            else if (desc === "Variation") {
-                varyDiv.style.display = "block";
-                varyOption.value = "Owner's Instruction";
-                queryDiv.style.display = "none";
-                queryOption.value = "";
-                docreqDiv.style.display = "none";
-                docreqOption.value = "";
-            }
-            else {
-                queryDiv.style.display = "none";
-                docreqDiv.style.display = "none";
-                varyDiv.style.display = "none";
-                queryOption.value = "";
-                docreqOption.value = "";
-                varyOption.value = "";
-            }
-        }
+
+            document.addEventListener('change', function (event) {
+                if (event.target && event.target.id === 'addTaskFile') {
+                    updateAddTaskFileIcon();
+                }
+            });
+
+            document.addEventListener('hidden.bs.modal', function (event) {
+                if (event.target && event.target.id === 'addTaskModal') {
+                    resetAddTaskFileInputAndIcon();
+                }
+            });
+        });
+
+        $(document).ready(function () {
+            $('a[id^="addTask_"]').click(function (event) {
+                event.preventDefault();
+
+                var siteId = $(this).data('siteid');
+
+                $.ajax({
+                    url: '/User/AddTask?siteid=' + encodeURIComponent(siteId),
+                    type: 'GET',
+                    success: function (data) {
+                        $('#addTaskModalBody').html(data);
+                        var uploadModal = new bootstrap.Modal(document.getElementById('addTaskModal'));
+                        uploadModal.show();
+                    },
+                    error: function () {
+                        alert('Failed to load the modal content.');
+                    }
+                });
+            });
+
+            $(document).on('submit', '#addtaskForm', function (event) {
+                var form = $(this);
+                if (form[0].checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                } else {
+                    event.preventDefault();
+                    var formData = new FormData(this);
+
+                    $.ajax({
+                        url: form.attr('action'),
+                        type: 'POST',
+                        data: formData,
+                        processData: false,
+                        contentType: false,
+                        success: function (response) {
+                            $('#addTaskModalBody').html(response);
+                        },
+                        error: function () {
+                            $('#addTaskModalBody').html(response);
+                        }
+                    });
+                }
+            });
+        });
     </script>
 }

@@ -9,47 +9,47 @@
     <meta http-equiv="Expires" content="0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap5.min.css">
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/custom.css"/>
+    <link rel="stylesheet" href="~/css/custom.css" />
 </head>
 <h1 style="text-align:center">My Task</h1>
 <div class="ccard" style="overflow-x: auto; max-width: 100%; border: 1px solid darkgray; border-collapse: collapse;">
     <table class="ctable ctable-hover ctable-responsive-sm ctable-sm" id="datatable" style="width: 100%; white-space: nowrap;">
-    <thead>
-        <tr>
-            <th class="text-center text-uppercase">Task No.</th>
-            <th class="text-center text-uppercase">Task Info</th>
-            <th class="text-center text-uppercase">Client/Site</th>
-            <th class="text-center text-uppercase">Added By</th>
-            <th class="text-center text-uppercase">Date Forwarded</th>
-            <th class="text-center text-uppercase">Date Received</th>
-            <th class="text-center text-uppercase">Assignee</th>
-            <th class="text-center text-uppercase">Action</th>
-        </tr>
-    </thead>
-    <tbody id="myTable">
+        <thead>
+            <tr>
+                <th class="text-center text-uppercase">Task No.</th>
+                <th class="text-center text-uppercase">Task Info</th>
+                <th class="text-center text-uppercase">Client/Site</th>
+                <th class="text-center text-uppercase">Added By</th>
+                <th class="text-center text-uppercase">Date Forwarded</th>
+                <th class="text-center text-uppercase">Date Received</th>
+                <th class="text-center text-uppercase">Assignee</th>
+                <th class="text-center text-uppercase">Action</th>
+            </tr>
+        </thead>
+        <tbody id="myTable">
             @foreach (System.Data.DataRow dr in ViewBag.Tasklog.Rows)
-        {
+            {
                 <tr id="row_@dr["TaskId"]" data-taskid="@dr["TaskId"].ToString()">
-                <td class="text-center text-nowrap show-details">@dr["TaskId"].ToString()</td>
-                @if ((int)dr["Circulation"] >= 1)
-                {
-                    int cir = (int)dr["Circulation"] + 1;
-                    <td class="text-center text-nowrap show-details" style="font-weight: bold;">
-                        @dr["Task"].ToString() @dr["Description"].ToString() v@(cir)
-                    </td>
-                }
-                else
-                {
-                        <td class="text-center text-nowrap show-details" style="font-weight: bold;">@dr["Task"].ToString() @dr["Description"].ToString()</td>
-                }
-                <td class="text-center text-nowrap show-details">@dr["Client"].ToString() @dr["Site"].ToString()</td>
-                <td class="text-center text-nowrap show-details">@dr["AddedBy"].ToString()</td>
-                <td class="text-center text-nowrap show-details">@dr["DateFwd"].ToString()</td>
-                <td class="text-center text-nowrap show-details">@dr["DateRcv"].ToString()</td>
-                <td class="text-center text-nowrap show-details">@dr["Name"].ToString()</td>
-                <td>
-                    @if (dr["Process"].ToString() == "Q7")
+                    <td class="text-center text-nowrap show-details">@dr["TaskId"].ToString()</td>
+                    @if ((int)dr["Circulation"] >= 1)
                     {
+                        int cir = (int)dr["Circulation"] + 1;
+                        <td class="text-center text-nowrap show-details" style="font-weight: bold;">
+                            @dr["Task"].ToString() @dr["Description"].ToString() v@(cir)
+                        </td>
+                    }
+                    else
+                    {
+                        <td class="text-center text-nowrap show-details" style="font-weight: bold;">@dr["Task"].ToString() @dr["Description"].ToString()</td>
+                    }
+                    <td class="text-center text-nowrap show-details">@dr["Client"].ToString() @dr["Site"].ToString()</td>
+                    <td class="text-center text-nowrap show-details">@dr["AddedBy"].ToString()</td>
+                    <td class="text-center text-nowrap show-details">@dr["DateFwd"].ToString()</td>
+                    <td class="text-center text-nowrap show-details">@dr["DateRcv"].ToString()</td>
+                    <td class="text-center text-nowrap show-details">@dr["Name"].ToString()</td>
+                    <td>
+                        @if (dr["Process"].ToString() == "Q7")
+                        {
                             <div class="modal fade" id="Sts_@dr["TaskId"].ToString()" tabindex="-1" aria-labelledby="stsModal_@dr["TaskId"].ToString()" aria-hidden="true">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
@@ -66,7 +66,7 @@
                                                 <input type="hidden" asp-for="Task" value="@dr["Task"].ToString()" />
                                                 <input type="hidden" asp-for="Details" value="@dr["Details"].ToString()" />
                                                 <input type="hidden" asp-for="AssignId" value="@ViewData["SessionId"]" />
-                                                <input type="hidden" asp-for="Code" value="Q8"/>
+                                                <input type="hidden" asp-for="Code" value="Q8" />
                                                 <input type="hidden" asp-for="SiteSC" value="@dr["SiteSC"].ToString()" />
                                                 <input type="hidden" asp-for="SiteTK" value="@dr["SiteTK"].ToString()" />
                                                 <button type="submit" class="btn btn-outline-info" id="confirmSts('@dr["TaskId"].ToString()')">Confirm</button>
@@ -76,23 +76,23 @@
                                     </div>
                                 </div>
                             </div>
-                        
-                        <div class="d-flex justify-content-center">
-                            <button id="btnRevise_@dr["TaskId"].ToString()" data-taskid="@dr["TaskId"].ToString()" type="button" class="btn btn-info" style="height: 25px; line-height: 12px; margin-right: 3px" data-bs-toggle="modal" data-bs-target="#ReviseModal">Revise</button>
-                            <button type="button" class="btn btn-primary" style="height: 25px; line-height: 12px;" data-bs-toggle="modal" data-bs-target="#Sts_@dr["TaskId"].ToString()">Send to Site</button>
-                        </div>
-                    }
-                    else
-                    {
-                        <div class="d-flex justify-content-center">
-                            <button id="btnFwd_@dr["TaskId"].ToString()" data-taskid="@dr["TaskId"].ToString()" type="button" class="btn btn-primary" style="height: 25px; line-height: 12px; margin-right: 3px" data-bs-toggle="modal" data-bs-target="#FwdModal">Forward</button>
-                            <button id="showUpload_@dr["TaskId"].ToString()" data-taskid="@dr["TaskId"].ToString()" type="button" class="btn btn-info" style="height: 25px; line-height: 12px">Upload</button>
-                        </div>
-                    }
-                    </tr>     
-        }
-    </tbody> 
-</table>
+
+                            <div class="d-flex justify-content-center">
+                                <button id="btnRevise_@dr["TaskId"].ToString()" data-taskid="@dr["TaskId"].ToString()" type="button" class="btn btn-info" style="height: 25px; line-height: 12px; margin-right: 3px" data-bs-toggle="modal" data-bs-target="#ReviseModal">Revise</button>
+                                <button type="button" class="btn btn-primary" style="height: 25px; line-height: 12px;" data-bs-toggle="modal" data-bs-target="#Sts_@dr["TaskId"].ToString()">Send to Site</button>
+                            </div>
+                        }
+                        else
+                        {
+                            <div class="d-flex justify-content-center">
+                                <button id="btnFwd_@dr["TaskId"].ToString()" data-taskid="@dr["TaskId"].ToString()" type="button" class="btn btn-primary" style="height: 25px; line-height: 12px; margin-right: 3px" data-bs-toggle="modal" data-bs-target="#FwdModal">Forward</button>
+                                <button id="showUpload_@dr["TaskId"].ToString()" data-taskid="@dr["TaskId"].ToString()" type="button" class="btn btn-info" style="height: 25px; line-height: 12px">Upload</button>
+                            </div>
+                        }
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
 
 <ul id="numbers" class="cpagination"></ul>
@@ -116,7 +116,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="FwdModalLabel">Forward Task</h5>
-                
+
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
