@@ -143,14 +143,30 @@
 
             $(document).on('submit', '#addtaskForm', function (event) {
                 var form = $(this);
+                var submitButton = form.find('button[type="submit"]');
+                var progressBar = $('#progressBar');
+                var progressBarContainer = $('#uploadProgressBar');
+
                 if (form[0].checkValidity() === false) {
                     event.preventDefault();
                     event.stopPropagation();
                 } else {
                     event.preventDefault();
                     var formData = new FormData(this);
-
+                    submitButton.prop('disabled', true);
+                    progressBarContainer.show();
                     $.ajax({
+                        xhr: function () {
+                            var xhr = new window.XMLHttpRequest();
+                            xhr.upload.addEventListener('progress', function (event) {
+                                if (event.lengthComputable) {
+                                    var percentComplete = Math.round((event.loaded / event.total) * 100);
+                                    progressBar.css('width', percentComplete + '%');
+                                    progressBar.text(percentComplete + '%');
+                                }
+                            }, false);
+                            return xhr;
+                        },
                         url: form.attr('action'),
                         type: 'POST',
                         data: formData,
@@ -158,13 +174,18 @@
                         contentType: false,
                         success: function (response) {
                             $('#addTaskModalBody').html(response);
+                            progressBarContainer.hide();
+                            submitButton.prop('disabled', false);
                         },
                         error: function () {
                             $('#addTaskModalBody').html(response);
+                            progressBarContainer.hide();
+                            submitButton.prop('disabled', false);
                         }
                     });
                 }
             });
+
         });
     </script>
 }

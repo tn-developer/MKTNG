@@ -194,22 +194,26 @@ namespace pcg.Controllers
                 {
                     cmd = new SqlCommand("UPDATE Users SET Name = '" + info.Name + "' WHERE Id = '" + sesId + "'", con);
                     cmd.ExecuteNonQuery();
+                    ViewBag.SuccessName = "Name updated";
                 }
                 if (info.Password != null)
                 {
                     cmd = new SqlCommand("UPDATE Users SET Password = '" + info.Password + "' WHERE Id = '" + sesId + "'", con);
                     cmd.ExecuteNonQuery();
+                    ViewBag.SuccessPass = "Password updated";
                 }
                 if (info.Email != null)
                 {
                     cmd = new SqlCommand("UPDATE Users SET Email = '" + info.Email + "' WHERE Id = '" + sesId + "'", con);
                     cmd.ExecuteNonQuery();
+                    ViewBag.SuccessEmail = "Email updated";
                 }
                 if (info.ContactNo != null)
                 {
                     cmd = new SqlCommand("UPDATE Users SET ContactNo = '" + info.ContactNo + "' WHERE Id = '" + sesId + "'", con);
                     cmd.ExecuteNonQuery();
-                }
+                    ViewBag.SuccessContactNo = "Contact# updated";
+                }                
             }
             if (con.State == ConnectionState.Open)
             {

@@ -1,7 +1,7 @@
 ﻿@model VariationModel
 
 <div class="modal-body">
-    <h6>For Task: @Model.SiteId</h6>
+    <h6>For Site: @Model.SiteId</h6>
 
     <form id="addtaskForm" method="post" enctype="multipart/form-data" action="/User/AddTask">
         <div asp-validation-summary="All" class="text-danger"></div>
@@ -62,6 +62,9 @@
         {
             <div class="text-success">@ViewBag.SuccessMessage</div>
         }
+        <div class="progress mt-3" style="display:none;" id="uploadProgressBar">
+            <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+        </div>
         <div class="modal-footer">
             <input type="hidden" name="siteid" value="@ViewData["SiteId"]" />
             <button type="submit" class="btn btn-primary">Submit</button>

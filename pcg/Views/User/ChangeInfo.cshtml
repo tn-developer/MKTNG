@@ -15,6 +15,22 @@
         <form asp-action="ChangeInfo">
         <div asp-validation-summary="All" class="text-danger"></div>
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @if (ViewBag.SuccessName != null)
+            {
+                <div class="text-success">@ViewBag.SuccessName</div>
+            }
+            @if (ViewBag.SuccessPass != null)
+            {
+                <div class="text-success">@ViewBag.SuccessPass</div>
+            }
+            @if (ViewBag.SuccessEmail != null)
+            {
+                <div class="text-success">@ViewBag.SuccessEmail</div>
+            }
+            @if (ViewBag.SuccessContactNo != null)
+            {
+                <div class="text-success">@ViewBag.SuccessContactNo</div>
+            }
     <div class="form-group">
         <label asp-for="Name" class="control-label"></label>
         <input asp-for="Name" class="form-control" placeholder=@Model.CurName/>

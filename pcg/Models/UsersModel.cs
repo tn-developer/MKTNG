@@ -44,10 +44,18 @@ namespace pcg.Models
     }
     public class ChangeInfo
     {
+        public class EmailFormatAttribute : RegularExpressionAttribute
+        {
+            public EmailFormatAttribute() : base(@"^(?=.*@(yahoo\.com|gmail\.com)$).*$")
+            {
+                ErrorMessage = "Invalid only @yahoo or @gmail is allowed.";
+            }
+        }
         public string Name { get; set; }
         public string Password { get; set;}
         [Compare("Password", ErrorMessage = "Passwords do not match.")]
         public string Confirm { get; set; }
+        [EmailFormat]
         public string Email { get; set;}
         public string ContactNo { get; set; }
         public string CurName { get; set; }
