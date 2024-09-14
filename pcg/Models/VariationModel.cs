@@ -29,6 +29,7 @@ namespace pcg.Models
         public string Process { get; set; }
         public string TaskType { get; set; }
         [DataType(DataType.Upload)]
+        [Required(ErrorMessage = "Please select file.")]
         public IFormFile UploadFile { get; set; }
         [Required(ErrorMessage = "File name cannot be empty.")]
         public string FileAlias { get; set; }

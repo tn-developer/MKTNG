@@ -7,29 +7,34 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/css/selectize.bootstrap5.min.css">
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/custom.css" />
 </head>
-<h1 style="text-align:center">Add Task</h1>
+<body>
+    <h1 style="text-align:center">Add Task</h1>
 
-@foreach (System.Data.DataRow dr in ViewBag.Sitelist.Rows)
-        {
-            <h6>Site: @dr["Client"].ToString() @dr["Site"].ToString()</h6>
-            <h6>OM: @dr["SiteOM"].ToString()</h6>
-            <h6>Site Id: @dr["SiteId"].ToString()</h6>
-        }       
-<div class="row">
-    <div class="col-md-12">
-        <form asp-action="AddTask" method="post" enctype="multipart/form-data">
-        <div asp-validation-summary="All" class="text-danger"></div>
-        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="form-group">
-        <label asp-for="Task" class="control-label">Task</label>
-        <input asp-for="Task" class="form-control"/>
-    </div>                      
-    <div class="form-group">
-        <label asp-for="Details" class="control-label">Details</label>
-        <textarea asp-for="Details" class="form-control" rows="4"></textarea>
-    </div>
-    <div class="form-group">
+    @foreach (System.Data.DataRow dr in ViewBag.Sitelist.Rows)
+    {
+        <h6>Site: @dr["Client"].ToString() @dr["Site"].ToString()</h6>
+        <h6>OM: @dr["SiteOM"].ToString()</h6>
+        <h6>Site Id: @dr["SiteId"].ToString()</h6>
+    }
+    <div class="row">
+        <div class="col-md-12">
+            <form id="addtaskform" asp-action="AddTask" method="post" enctype="multipart/form-data">
+                <div id="statusmsg" class="mt-3" style="display: none;"></div>
+                <div asp-validation-summary="All" class="text-danger"></div>
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Task" class="control-label">Task</label>
+                    <input asp-for="Task" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label asp-for="Details" class="control-label">Details</label>
+                    <textarea asp-for="Details" class="form-control" rows="4"></textarea>
+                </div>
+                <div class="form-group">
                     <label asp-for="Description" class="control-label"></label>
                     <select id="desc" asp-for="Description" class="form-control" onchange="showoptions()">
                         <option value="Query" selected>Query</option>
@@ -39,62 +44,70 @@
                 </div>
                 <div id="query" class="form-group" style="display: block;">
                     <label for="queryoption" asp-for="Descquery" class="control-label">Query</label>
-                        <select id="queryoption" asp-for="Descquery" class="form-control">
-                            <option value="Plan">Plan</option>
-                            <option value="Contract/Billing">Contract/Billing</option>
-                            <option value="Schedule">Schedule</option>
-                            <option value="Finishing">Finishing</option>
-                        </select>
+                    <select id="queryoption" asp-for="Descquery" class="form-control">
+                        <option value="Plan">Plan</option>
+                        <option value="Contract/Billing">Contract/Billing</option>
+                        <option value="Schedule">Schedule</option>
+                        <option value="Finishing">Finishing</option>
+                    </select>
                 </div>
                 <div id="vary" class="form-group" style="display: none;">
                     <label for="varyoption" asp-for="Descvary" class="control-label">Variation</label>
-                        <select id="varyoption" asp-for="Descvary" class="form-control">
-                            <option value="Owner's Instruction">Owner's Instruction</option>
-                            <option value="Subcon">Subcon</option>                           
-                        </select>
+                    <select id="varyoption" asp-for="Descvary" class="form-control">
+                        <option value="Owner's Instruction">Owner's Instruction</option>
+                        <option value="Subcon">Subcon</option>
+                    </select>
                 </div>
                 <div id="docreq" class="form-group" style="display: none;">
                     <label for="docreqoption" asp-for="Descdocreq" class="control-label">Document Request</label>
-                        <select id="docreqoption" asp-for="Descdocreq" class="form-control">
-                            <option value="Plan">Plan</option>
-                            <option value="Contract">Contract</option>
-                            <option value="Schedule">Schedule</option>
-                            <option value="Finishing">Finishing</option>
-                        </select>
+                    <select id="docreqoption" asp-for="Descdocreq" class="form-control">
+                        <option value="Plan">Plan</option>
+                        <option value="Contract">Contract</option>
+                        <option value="Schedule">Schedule</option>
+                        <option value="Finishing">Finishing</option>
+                    </select>
                 </div>
-            <div class="form-group">
-                <label asp-for="AssignId" class="control-label">Assign To</label>
-                <select asp-for="AssignId" class="form-control">
-                    @foreach (System.Data.DataRow dr in ViewBag.Userlist.Rows)
+                <div class="form-group">
+                    <label asp-for="AssignId" class="control-label">Assign To</label>
+                    <select asp-for="AssignId" class="form-control">
+                        @foreach (System.Data.DataRow dr in ViewBag.Userlist.Rows)
+                        {
+                            <option value="@dr["Id"].ToString()">@dr["Name"].ToString(): @dr["Position"].ToString()</option>
+                        }
+                    </select>
+                </div>
+                <div>
+                    <label asp-for="FileAlias" class="control-label">File Name</label>
+                    <input asp-for="FileAlias" class="form-control" />
+                    <span class="text-danger">@Html.ValidationMessageFor(m => m.FileAlias)</span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="UploadFile" class="form-label">Choose file</label>
+                    <input asp-for="UploadFile" class="form-control" type="file" id="fileInput">
+                    <span class="text-danger">@Html.ValidationMessageFor(m => m.UploadFile)</span>
+                    <div class="progress mt-2">
+                        <div id="progressBar" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">0%</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    @foreach (System.Data.DataRow dr in ViewBag.Sitelist.Rows)
                     {
-                        <option value="@dr["Id"].ToString()">@dr["Name"].ToString(): @dr["Position"].ToString()</option>
+                        <input type="hidden" name="SiteReqId" value="@dr["SiteId"].ToString()" />
+                        <input type="hidden" name="siteId" value="@dr["SiteId"].ToString()" />
                     }
-                </select>
-            </div>
-            <div>
-                <label asp-for="FileAlias" class="control-label">File Name</label>
-                <input asp-for="FileAlias" class="form-control" />
-                <span class="text-danger">@Html.ValidationMessageFor(m => m.FileAlias)</span>
-            </div>
-            <div class="mb-3">
-                <label asp-for="UploadFile" class="form-label">Choose file</label>
-                <input asp-for="UploadFile" class="form-control" type="file">
-                <span class="text-danger">@Html.ValidationMessageFor(m => m.UploadFile)</span>
-            </div>
-    <div class="form-group">
-            @foreach (System.Data.DataRow dr in ViewBag.Sitelist.Rows)
-            {
-                <input type="hidden" name="SiteReqId" value="@dr["SiteId"].ToString()"/>
-                <input type="hidden" name="siteId" value="@dr["SiteId"].ToString()" />
-                <button type="submit" class="btn btn-primary btn-block">Add Task</button>
-            }           
+                    <button type="button" id="submitBtn" class="btn btn-primary btn-block" onclick="submitForm()">Add Task</button>
+                </div>
+            </form>
+        </div>
     </div>
-        </form>
-    </div>
-</div>
+</body>
+
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.11.7/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.15.2/js/selectize.min.js"></script>
 }
 <script>
     function showoptions() {
@@ -144,4 +157,60 @@
         }
     }
     showoptions();
+
+    function submitForm() {
+        console.log('Form submission triggered by button click');
+
+        var form = $('#addtaskform');
+        var formData = new FormData(form[0]);
+        var progressBar = $('#progressBar');
+
+        $('#submitBtn').prop('disabled', true).text('-- Loading --');
+        console.log('Submit button disabled');
+
+        $.ajax({
+            url: form.attr('action'),
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            cache: false, 
+            enctype: 'multipart/form-data',
+            xhr: function () {
+                var xhr = new XMLHttpRequest();
+                xhr.upload.onprogress = function (e) {
+                    if (e.lengthComputable) {
+                        var percentComplete = Math.round((e.loaded / e.total) * 100);
+                        console.log('Progress: ' + percentComplete + '%');
+                        progressBar.css('width', percentComplete + '%');
+                        progressBar.text(percentComplete + '%');
+                    }
+                };
+                return xhr;
+            },
+            success: function (response) {
+                console.log('Upload successful');
+                $('#statusmsg').text('File uploaded successfully').css('color', 'green').show();
+                if (response.success) {
+                    window.location.href = response.redirectUrl;
+                }
+                else 
+                {
+                    $('#statusmsg').text('Error occurred during upload').css('color', 'red').show();
+                }
+            },
+            error: function (xhr, status, error) {
+
+                console.error('Upload error: ' + error);
+                $('#statusmsg').text('Error occurred during upload').css('color', 'red').show();
+            },
+            complete: function () {
+                $('#submitBtn').prop('disabled', false).text('Add Task');
+                console.log('Upload complete, button re-enabled');
+                if (response.success) {
+                    window.location.href = response.redirectUrl;
+                }
+            }
+        });
+    }
 </script>

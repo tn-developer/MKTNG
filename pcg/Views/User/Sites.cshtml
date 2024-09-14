@@ -18,6 +18,7 @@
     <thead>
         <tr>
             <th class="text-center text-uppercase">Client/Site</th>
+            <th class="text-center text-uppercase">SOM</th>
             <th class="text-center text-uppercase">OM</th>
             <th class="text-center text-uppercase"> SC/TK</th>
             <th class="text-center text-uppercase">Details</th>
@@ -28,7 +29,8 @@
         {
             <tr>
                 <td class="text-center text-nowrap">@dr["Client"].ToString() @dr["Site"].ToString()</td>
-                <td class="text-center text-nowrap">@dr["OMName"].ToString()@dr["SOMName"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["SOMName"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["OMName"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["SCName"].ToString()@dr["TKName"].ToString()</td>
                 <td class="text-center text-nowrap">
                     <div style="text-align:center">

@@ -309,6 +309,9 @@
 
                 var form = $(this);
                 var formData = new FormData(this);
+                var submitButton = $('#submit');  
+
+                submitButton.prop('disabled', true);
 
                 $.ajax({
                     url: form.attr('action'),
@@ -316,15 +319,39 @@
                     data: formData,
                     processData: false,
                     contentType: false,
+
+                    xhr: function () {
+                        var xhr = new window.XMLHttpRequest();
+
+                        xhr.upload.addEventListener('progress', function (e) {
+                            if (e.lengthComputable) {
+                                var percentComplete = Math.round((e.loaded / e.total) * 100);
+
+                                $('#progressBar').css('width', percentComplete + '%');
+                                $('#progressBar').attr('aria-valuenow', percentComplete);
+                                $('#progressBar').text(percentComplete + '%');
+                            }
+                        }, false);
+
+                        return xhr;
+                    },
+
                     success: function (response) {
-                        $('#uploadModalBody').html(response); // Reload the modal content with validation results
+                        $('#progressBar').css('width', '0%');
+                        $('#progressBar').attr('aria-valuenow', '0');
+                        $('#progressBar').text('0%');
+                        $('#uploadModalBody').html(response);
+                        submitButton.prop('disabled', false);
                     },
                     error: function () {
-                        alert('File upload failed.');
+                        $('#progressBar').css('width', '0%');
+                        $('#progressBar').attr('aria-valuenow', '0');
+                        $('#progressBar').text('0%');
+                        $('#uploadModalBody').html(response);
+                        submitButton.prop('disabled', false);
                     }
                 });
             });
-
 
             var sortOrder = 1;
             var currentPage = 1;

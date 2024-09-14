@@ -538,6 +538,7 @@ namespace pcg.Controllers
                         cmd.Parameters.AddWithValue("@Details", details);
                     }
                     cmd.ExecuteNonQuery();
+                    return Json(new { success = true, redirectUrl = Url.Action("Sites", "Admin") });
                 }
             }
             else
@@ -636,6 +637,7 @@ namespace pcg.Controllers
                         cmd.Parameters.AddWithValue("@Details", details);
                     }
                     cmd.ExecuteNonQuery();
+                    return Json(new { success = true, redirectUrl = Url.Action("Sites", "Admin") });
                 }
             }
             if (con.State == ConnectionState.Open)
@@ -953,7 +955,7 @@ namespace pcg.Controllers
             {
                 con.Close();
             }
-            return View();
+            return RedirectToAction("Sites", "Admin");
         }
         public IActionResult Forwarded()
         {

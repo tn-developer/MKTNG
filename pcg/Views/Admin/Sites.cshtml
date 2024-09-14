@@ -139,7 +139,8 @@
     <thead>
         <tr>
             <th class="text-center text-uppercase">Client/Site</th>
-            <th class="text-center text-uppercase">SOM/OM</th>
+            <th class="text-center text-uppercase">SOM</th>
+            <th class="text-center text-uppercase">OM</th>
             <th class="text-center text-uppercase">SC/TK</th>
             <th class="text-center text-uppercase">Details</th>
         </tr>
@@ -149,7 +150,8 @@
         {
             <tr class="row-click" onclick="toggleRows(this)">
                 <td class="text-center text-nowrap">@dr["Client"].ToString() @dr["Site"].ToString()</td>
-                <td class="text-center text-nowrap">@dr["SOM"].ToString()/@dr["OM"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["SOM"].ToString()</td>
+                <td class="text-center text-nowrap">@dr["OM"].ToString()</td>
                 <td class="text-center text-nowrap">@dr["SC"].ToString()@dr["TK"].ToString()</td>
                 <td class="text-center text-nowrap">         
                     <div style="text-align:center">
