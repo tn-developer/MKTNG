@@ -955,7 +955,7 @@ namespace pcg.Controllers
             {
                 con.Close();
             }
-            return RedirectToAction("Sites", "Admin");
+            return RedirectToAction("Pending", "Admin");
         }
         public IActionResult Forwarded()
         {
