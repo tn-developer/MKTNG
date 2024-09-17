@@ -955,7 +955,7 @@ namespace pcg.Controllers
             {
                 con.Close();
             }
-            return RedirectToAction("Pending", "Admin");
+            return View();
         }
         public IActionResult Forwarded()
         {
@@ -1181,7 +1181,7 @@ namespace pcg.Controllers
                         "ON t.SiteReqId = s.SiteId " +
                         "LEFT JOIN Taskprocess p " +
                         "ON t.Process = p.Code " +
-                        "WHERE (t.Status = 'Waiting' OR t.Status = 'Pre-approve') AND t.TaskId = " + taskId + " " +
+                        "WHERE t.Status IN ('Waiting', 'SOM-approve', 'Pending') AND t.TaskId = " + taskId + " " +
                         "ORDER BY TaskId DESC", con);
 
                 DataSet task = new DataSet();
@@ -2020,13 +2020,15 @@ namespace pcg.Controllers
                         .Where(a => a.TaskId == int.Parse(taskid))
                         .Select(a => new
                         {
-                            a.TaskId
+                            a.TaskId,
+                            a.Task
                         });
             var taskresult = task.FirstOrDefault();
 
             var fm = new FileModel
             {
-                TaskId = taskresult.TaskId
+                TaskId = taskresult.TaskId,
+                Task = taskresult.Task
             };
             if (con.State == ConnectionState.Open)
             {

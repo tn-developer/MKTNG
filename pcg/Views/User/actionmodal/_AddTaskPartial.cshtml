@@ -1,8 +1,10 @@
 ﻿@model VariationModel
 
 <div class="modal-body">
-    <h6>For Site: @Model.SiteId</h6>
-
+    @foreach (System.Data.DataRow dr in ViewBag.Sitelist.Rows)
+    {
+        <h5>For Site: @dr["Client"].ToString() @dr["Site"].ToString()</h5>
+    }
     <form id="addtaskForm" method="post" enctype="multipart/form-data" action="/User/AddTask">
         <div asp-validation-summary="All" class="text-danger"></div>
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>

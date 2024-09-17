@@ -178,6 +178,9 @@
                             $('#addTaskModalBody').html(response);
                             progressBarContainer.hide();
                             submitButton.prop('disabled', false);
+                            setTimeout(function () {
+                                $('#addTaskModal').modal('hide');
+                            }, 1000);
                         },
                         error: function () {
                             $('#addTaskModalBody').html(response);
@@ -187,7 +190,6 @@
                     });
                 }
             });
-
         });
     </script>
 }

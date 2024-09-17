@@ -1,7 +1,7 @@
 ﻿@model FileModel
 
 <div class="modal-body">
-    <h6>For Task @Model.TaskId</h6>
+    <h6>For Task @Model.Task</h6>
 
     <form id="uploadForm" method="post" enctype="multipart/form-data" action="/Admin/UploadFile">
         <input type="hidden" name="taskid" value="@Model.TaskId" />
