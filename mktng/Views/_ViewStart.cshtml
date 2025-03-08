@@ -1,0 +1,14 @@
+﻿@{
+    if (ViewBag.Layout == "Admin")
+    {
+        Layout = "_Admin";
+    }
+    if (ViewBag.Layout == "SAdmin")
+    {
+        Layout = "_Admin";
+    }
+    if (ViewBag.Layout == null)
+    {
+        Layout = "_Layout";
+    }
+}

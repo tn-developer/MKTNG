@@ -1,0 +1,305 @@
+﻿
+
+body {
+    font-family: "Open Sans", serif;
+    font-weight: bold;
+    background-color:powderblue;
+}
+.ctable {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #000000;
+}
+
+.ctable th {
+    padding: 0.75rem;
+    vertical-align: top;
+    border: 1px solid #000000;
+    border-bottom: 0px;
+    background-color: #fffa36;
+}
+
+    .ctable td {
+        padding: 0.75rem;
+        vertical-align: top;
+        border-left: 1px solid #000000;
+        border-right: 1px solid #000000;
+        border-bottom: none;
+        background-color: #eeeeee;
+        color: #000000;
+    }
+
+    .ctable thead tr th {
+        border-bottom: 1px solid #000000;
+    }
+
+    .ctable tr:last-child td {
+        border-bottom: 1px solid #000000;
+    }
+
+.last-row td {
+    border-bottom: 1px solid #000000;
+}
+
+.ctable-hover {
+    color: #000000;
+}
+
+    .ctable-hover tbody tr:hover td {
+        color: #000000;
+        background-color: #fffa36;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+
+.ctable-sm th,
+.ctable-sm td {
+    padding: 0.3rem;
+}
+
+@media (max-width: 576px) {
+  .ctable-responsive-sm {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}
+
+.no-hover {
+    pointer-events: none; 
+}
+
+    .no-hover:hover {
+        background-color: initial;
+    }
+
+.cpagination {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+    .cpagination li {
+        margin: 0;
+        padding: 0;
+    }
+
+        .cpagination li a {
+            color: #000000;
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+            z-index: 1;
+        }
+
+            .cpagination li a:hover {
+                background-color: #000000;
+                color: #ffffff;
+                text-decoration: none;
+            }
+
+.cpage-item:first-child .cpage-link {
+    border-radius: 20px 0 0 20px;
+    color: #000;
+    background-color: #fffa36;
+    border-color: #000000;
+}
+
+.cpage-item:last-child .cpage-link {
+    border-radius: 0 20px 20px 0;
+    color: #000;
+    background-color: #fffa36;
+    border-color: #000000;
+}
+
+.cpage-item:first-child .cpage-link:hover {
+    border-radius: 20px 0 0 20px;
+    color: #ffffff;
+    background-color: #000000;
+    border-color: #000000;
+}
+
+.cpage-item:last-child .cpage-link:hover {
+    border-radius: 0 20px 20px 0;
+    color: #ffffff;
+    background-color: #000000;
+    border-color: #000000;
+}
+
+.cpage-item.active .cpage-link {
+    z-index: 1;
+    color: #000;
+    background-color: #fffa36;
+    border-color: #fffa36;
+}
+
+.cpage-item.disabled .cpage-link {
+    color: #ffffff;
+    pointer-events: none;
+    cursor: not-allowed;
+    background-color: #000000;
+    border-color: #fffa36;
+}
+
+.ccard {
+    flex: 1 1 calc(100% - 20px);
+    max-width: calc(100% - 20px);
+    background: rgba(231, 231, 231, 0.678);
+    box-shadow: rgba(0, 0, 0, 0.4) 0px 2px 4px, rgba(0, 0, 0, 0.3) 0px 7px 13px -3px, rgba(0, 0, 0, 0.2) 0px -3px 0px inset;
+    padding: 24px;
+    margin-bottom: 20px;
+    overflow-x: auto; 
+    border: 1px solid darkgray; 
+    border-collapse: collapse;
+}
+.modal-body #fileIcon.custom-icon {
+    width: 80px !important;
+    height: 80px !important;
+    object-fit: cover !important;
+    display: block;
+}
+
+
+.acontainer {
+    margin-top: 1rem;
+}
+
+.acard {
+    background-color: #fffa36;
+    border-left: 15px solid #FFC300;
+    box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.1);
+    transition: none;
+    margin-bottom: 1.5rem;
+    border-radius: 0.25rem;
+}
+
+
+.acard-header h3 {
+    font-weight: bold;
+    margin-bottom: 0;
+    color: #000;
+}
+
+.acard-body .arow {
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+    background-color: white;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.acard-body label {
+    font-weight: bold;
+    color: #333;
+    margin-right: 10px;
+    flex: 0 0 30%;
+    text-align: right;
+}
+
+.acard-body span {
+    flex: 1;
+    color: #333;
+}
+
+.acard-body p {
+    color: #000;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin: 1rem 0;
+}
+
+.cusbtn:hover, .cusbtn-test:hover, .cusbtn-warning:hover, .cusbtn-info:hover, .cusbtn-success:hover, .cusbtn-custom:hover, .cusbtn-primary:hover, .cusbtn-secondary:hover, .cusbtn-light:hover, .cusbtn-dark:hover, .cusbtn-link:hover {
+    transform: scale(1.05); 
+}
+.cusbtn-blk {
+    display: block;
+    width: 100%;
+    color:red;
+}
+.cusbtn {
+    background-color: #F70D1A;
+    color: #fff;
+    height: 25px;
+    display: inline-block;
+    border-radius: 0.375rem;
+    line-height: 12px;
+}
+.cusbtn-warning {
+    background-color: #f39c12;
+    color: #fff;
+    height: 25px;
+    display: inline-block;
+    border-radius: 0.375rem;
+    line-height: 12px;
+}
+.cusbtn-info {
+    background-color: #3498db;
+    color: #fff;
+    height: 25px;
+    display: inline-block;
+    border-radius: 0.375rem;
+    line-height: 12px;
+}
+.cusbtn-success {
+    background-color: #2ecc71;
+    color: #fff;
+    height: 25px;
+    display: inline-block;
+    border-radius: 0.375rem;
+    line-height: 12px;
+}
+.cusbtn-custom {
+    background-color: #9b59b6;
+    color: #fff;
+    height: 25px;
+    display: inline-block;
+    border-radius: 0.375rem;
+    line-height: 12px;
+}
+.cusbtn-primary {
+    background-color: #007bff;
+    color: #fff;
+    height: 25px;
+    display: inline-block;
+    border-radius: 0.375rem;
+    line-height: 12px;
+}
+.cusbtn-secondary {
+    background-color: #6c757d;
+    color: #fff;
+    height: 25px;
+    display: inline-block;
+    border-radius: 0.375rem;
+    line-height: 12px;
+}
+.cusbtn-light {
+    background-color: #f8f9fa;
+    color: #212529;
+    height: 25px;
+    display: inline-block;
+    border-radius: 0.375rem;
+    line-height: 12px;
+}
+.cusbtn-dark {
+    background-color: #343a40;
+    color: #fff;
+    height: 25px;
+    display: inline-block;
+    border-radius: 0.375rem;
+    line-height: 12px;
+}
+.cusbtn-link {
+    background-color: transparent;
+    color: #007bff;
+    text-decoration: underline;
+}
+.rm-3{
+    margin-right: 3px;
+}
+

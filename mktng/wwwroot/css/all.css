@@ -1,0 +1,298 @@
+﻿/* General Styles */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background-color: #eaeaea; /* Light gray */
+    color: #333333; /* Dark gray text for readability */
+}
+
+/* Mobile Navigation Bar */
+.mobile-nav {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #ffffff; /* Pure white */
+    color: #1b4552; /* Dark blue */
+    z-index: 1000;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.4s ease-in-out;
+}
+
+.mobile-nav-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px;
+    transition: all 0.3s ease;
+}
+/* Logo Animation */
+.mobile-logo {
+    max-height: 40px;
+    margin-left: 10px;
+    animation: logo-bounce 1.8s infinite alternate;
+}
+
+@keyframes logo-bounce {
+    0% {
+        transform: translateY(0);
+    }
+
+    100% {
+        transform: translateY(-6px);
+    }
+}
+/* Toggle Button */
+.toggle-btn {
+    border: none;
+    color: #333333; /* Soft blue-gray accent */
+    font-size: 24px;
+    cursor: pointer;
+    margin-right: 10px;
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+    .toggle-btn:hover {
+        transform: rotate(90deg);
+        color: #183e4b; /* Deeper blue on hover */
+    }
+/* Mobile Menu */
+.mobile-nav-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: none;
+    overflow-y: auto;
+    max-height: calc(100vh - 60px);
+    transition: max-height 0.4s ease-in-out;
+}
+
+    .mobile-nav-menu.show {
+        display: block;
+    }
+
+    .mobile-nav-menu li {
+        padding: 14px;
+        cursor: pointer;
+        border-bottom: 1px solid #dcdcdc; /* Light gray divider */
+        transition: background-color 0.3s ease-in-out;
+    }
+
+        .mobile-nav-menu li:hover {
+            background-color: #f0f8f8; /* Subtle blue-gray hover effect */
+        }
+
+        .mobile-nav-menu li a {
+            color: #1b4552; /* Dark blue text */
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .mobile-nav-menu li i {
+            margin-right: 12px;
+        }
+/* Smooth Submenu */
+.mobile-submenu {
+    list-style: none;
+    padding-left: 20px;
+    display: none;
+    transition: all 0.3s ease-in-out;
+}
+
+    .mobile-submenu.show {
+        display: block;
+    }
+
+/* Desktop Sidebar */
+.nav-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    height: 100%;
+    background-color: #ffffff; /* Pure white */
+    color: #1b4552; /* Dark blue */
+    transition: width 0.3s ease-in-out;
+    overflow: hidden;
+    z-index: 1000;
+    box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+    .nav-container.collapsed {
+        width: 75px;
+    }
+/* Toggle Button */
+.toggle-btn {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: none;
+    border: none;
+    cursor: pointer;
+    position: relative;
+}
+
+    .toggle-btn .bar {
+        position: relative;
+        width: 24px;
+        height: 3px;
+        background-color: #8ba0a4; /* Soft blue-gray accent */
+        transition: all 0.3s ease-in-out;
+    }
+
+        .toggle-btn .bar::before,
+        .toggle-btn .bar::after {
+            content: "";
+            position: absolute;
+            width: 24px;
+            height: 3px;
+            background-color: #8ba0a4; /* Soft blue-gray accent */
+            transition: all 0.3s ease-in-out;
+        }
+
+        .toggle-btn .bar::before {
+            top: -8px;
+        }
+
+        .toggle-btn .bar::after {
+            bottom: -8px;
+        }
+    /* When Active (X Shape) */
+    .toggle-btn.active .bar {
+        background: transparent;
+    }
+
+        .toggle-btn.active .bar::before {
+            transform: rotate(45deg);
+            top: 0;
+        }
+
+        .toggle-btn.active .bar::after {
+            transform: rotate(-45deg);
+            bottom: 0;
+        }
+
+.nav-menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+    .nav-menu li {
+        padding: 15px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        transition: background-color 0.3s ease-in-out, transform 0.2s ease-in-out;
+    }
+
+        .nav-menu li:hover {
+            background-color: #f0f8f8; /* Subtle blue-gray hover effect */
+            transform: translateX(5px);
+        }
+
+        .nav-menu li i {
+            margin-right: 12px;
+            transition: color 0.3s ease-in-out;
+            color: #333333; /* Soft blue-gray accent */
+        }
+
+        .nav-menu li span {
+            display: inline-block;
+            transition: opacity 0.3s ease-in-out;
+            color: #1b4552; /* Dark blue text */
+        }
+
+.nav-container.collapsed .nav-menu li span {
+    display: none;
+}
+/* Submenu */
+.submenu {
+    list-style: none;
+    padding-left: 30px;
+    color: #1b4552; /* Dark blue text */
+    display: none;
+    transition: all 0.3s ease-in-out;
+}
+
+    .submenu.show {
+        display: block;
+    }
+
+/* Footer */
+.nav-footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    text-align: center;
+    padding: 12px;
+    background-color: #ffffff; /* Pure white */
+}
+
+    .nav-footer img.full-logo {
+        display: block;
+        max-width: 100%;
+        height: auto;
+    }
+
+    .nav-footer img.icon-logo {
+        display: none;
+        max-width: 100%;
+        height: auto;
+    }
+
+.nav-container.collapsed .nav-footer img.full-logo {
+    display: none;
+}
+
+.nav-container.collapsed .nav-footer img.icon-logo {
+    display: block;
+}
+
+/* Main Content */
+.main-content {
+    margin-left: 260px;
+    padding: 10px;
+    transition: margin-left 0.4s ease-in-out;
+}
+
+.nav-container.collapsed + .main-content {
+    margin-left: 75px;
+}
+
+/* Admin Footer */
+.admin-footer {
+    background-color: #ffffff; /* Pure white */
+    color: #333333; /* Soft blue-gray accent */
+    text-align: right;
+    padding: 12px;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    .mobile-nav {
+        display: block;
+    }
+
+    .nav-container {
+        display: none;
+    }
+
+    .main-content {
+        margin-left: 0;
+        margin-top: 40px;
+        padding: 20px;
+    }
+}

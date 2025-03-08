@@ -1,0 +1,157 @@
+﻿/* General Reset */
+body {
+    margin: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f9f9f9; /* Soft white background */
+    color: #333333; /* Dark gray text for readability */
+}
+
+/* Page Container */
+.page-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 1rem; /* Add padding for small screens */
+}
+
+/* Card Styling */
+.auth-card {
+    background: #ffffff; /* Clean white card background */
+    border-radius: 16px; /* Rounded corners */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    padding: 1.5rem; /* Default padding */
+    width: 100%;
+    max-width: 450px; /* Default max-width for login */
+    overflow: hidden; /* Prevent content from overflowing */
+}
+
+/* Registration-Specific Styling */
+.register-form {
+    max-width: 700px; /* Slightly wider for registration */
+    height: auto; /* Allow height to adjust dynamically */
+    display: block;
+    flex-direction: column;
+    justify-content: space-between; /* Space out content vertically */
+    align-items: center; /* Center content horizontally */
+}
+
+/* Form Elements */
+.form-input {
+    border: 1px solid #d1d1d1; /* Soft gray border */
+    border-radius: 8px; /* Rounded corners */
+    padding: 0.75rem;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+    width: 100%; /* Ensure full width on small screens */
+}
+
+    .form-input:focus {
+        border-color: #ffb504; /* Golden yellow accent on focus */
+        box-shadow: 0 0 8px rgba(255, 181, 4, 0.5); /* Subtle glow */
+        outline: none;
+        transform: scale(1.02); /* Slightly enlarge input on focus */
+    }
+
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    color: #333333; /* Dark gray text */
+    font-size: 0.9rem; /* Smaller font size for mobile */
+    transition: color 0.3s ease;
+}
+
+    .form-label:hover {
+        color: #ffb504; /* Golden yellow on hover */
+    }
+
+/* Buttons */
+.primary-btn {
+    background-color: #333333; /* Golden yellow button */
+    color: #ffb504;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    padding: 0.75rem;
+    font-size: 1rem;
+    width: 100%;
+    display: block;
+    margin: 0 auto;
+    transform: scale(1); /* Start at normal size */
+}
+
+    .primary-btn:hover {
+        background-color: #ffb504; /* Coral orange on hover */
+        color: #333333;
+        transform: scale(1.05); /* Enlarge button on hover */
+    }
+
+/* Links */
+.link-accent {
+    color: #ffb504; /* Golden yellow link */
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.3s ease, transform 0.3s ease;
+    font-size: 0.9rem;
+    display: inline-block;
+    width: 100%; /* Full width on mobile */
+    text-align: center;
+}
+
+    .link-accent:hover {
+        color: #ff7f50; /* Coral orange on hover */
+        transform: translateX(5px); /* Slight movement on hover */
+    }
+
+/* Error/Alert Messages */
+.text-danger {
+    color: #e74c3c; /* Red for errors */
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+}
+
+/* Two-Column Layout for Registration Only */
+@media (min-width: 768px) {
+    .register-form .row > div {
+        flex: 0 0 50%; /* Each column takes up 50% of the row */
+        max-width: 50%; /* Ensure columns don't exceed 50% width */
+    }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    /* Adjust Card Styling */
+    .auth-card {
+        padding: 1rem; /* Smaller padding for mobile */
+        max-width: 100%; /* Full width on mobile */
+    }
+    /* Adjust Font Sizes */
+    h2,
+    h4 {
+        font-size: 1.25rem; /* Reduce heading size for mobile */
+    }
+
+    .form-input {
+        font-size: 0.9rem; /* Slightly smaller input text */
+        padding: 0.6rem; /* Smaller padding */
+    }
+
+    .form-label {
+        font-size: 0.8rem; /* Smaller label text */
+    }
+
+    .primary-btn {
+        font-size: 0.9rem; /* Smaller button text */
+        padding: 0.6rem; /* Smaller padding */
+    }
+
+    .link-accent {
+        font-size: 0.8rem; /* Smaller link text */
+    }
+    /* Stack Columns Vertically */
+    .register-form .row > div {
+        flex: 0 0 100%; /* Each column takes up 100% of the row */
+        max-width: 100%; /* Ensure columns stack vertically */
+    }
+}

@@ -1,0 +1,168 @@
+﻿/* General Styles */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #eaeaea; /* Light gray */
+}
+
+h1 {
+    text-align: center;
+    color: #1b4552; /* Dark blue-green */
+    margin-top: 20px;
+    font-size: 24px;
+}
+
+/* Card Container */
+.ccard {
+    border: 1px solid #8ba0a4; /* Soft blue-gray border */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft shadow */
+    margin: 20px auto;
+    max-width: 100%;
+    overflow-x: auto;
+    background-color: #ffffff; /* White background */
+    padding: 20px;
+    z-index: 1000;
+}
+
+/* Table Styles */
+.ctable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    text-align: center;
+    margin: 0 auto;
+}
+
+    .ctable thead {
+        background-color: #183e4b; /* Deep blue-green for header */
+        color: #ffffff; /* White text */
+    }
+
+    .ctable th, .ctable td {
+        padding: 12px;
+        border: 1px solid #8ba0a4; /* Soft blue-gray border */
+        white-space: nowrap;
+    }
+
+    .ctable tbody tr:hover {
+        background-color: #8ba0a4; /* Soft blue-gray for hover effect */
+        color: #ffffff; /* White text */
+    }
+
+/* Button Styles */
+button.cusbtn-primary {
+    background-color: #183e4b; /* Deep blue-green for primary buttons */
+    color: #ffffff; /* White text */
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+    button.cusbtn-primary:hover {
+        background-color: #1b4552; /* Darker blue-green for hover */
+        transform: scale(1.05);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+    }
+
+    button.cusbtn-primary:active {
+        background-color: #183e4b;
+        transform: scale(0.98);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+.cusbtn-secondary {
+    background-color: #ffffff; /* White for secondary buttons */
+    color: #1b4552; /* Dark blue-green text */
+    border: 1px solid #8ba0a4; /* Soft blue-gray border */
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+    .cusbtn-secondary:hover {
+        background-color: #8ba0a4; /* Soft blue-gray hover */
+        transform: scale(1.05);
+    }
+
+/* Success Button */
+.cusbtn-success {
+    background-color: #1b4552; /* Dark blue-green */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+    .cusbtn-success:hover {
+        background-color: #183e4b; /* Slightly darker blue-green */
+        transform: scale(1.05);
+    }
+
+/* Danger Button */
+.cusbtn-danger {
+    background-color: #e74c3c; /* Bright red for danger actions */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+    .cusbtn-danger:hover {
+        background-color: #c0392b; /* Darker red */
+        transform: scale(1.05);
+    }
+
+/* Modal Styles */
+.modal-content {
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    background-color: #ffffff; /* White background */
+}
+
+.modal-header {
+    background-color: #183e4b; /* Deep blue-green for header */
+    color: #ffffff; /* White text */
+    border-bottom: none;
+}
+
+.modal-body {
+    padding: 20px;
+    font-size: 14px;
+    color: #1b4552; /* Dark blue-green text */
+}
+
+.modal-footer {
+    border-top: none;
+    display: flex;
+    justify-content: space-between;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .ccard {
+        margin: 10px;
+    }
+
+    .ctable {
+        font-size: 12px;
+    }
+
+    .cusbtn {
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+}

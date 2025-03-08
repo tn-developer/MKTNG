@@ -1,0 +1,178 @@
+﻿@model mktng.Models.ClientModel
+@{
+    ViewData["Title"] = "Add New Client";
+}
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/addclient.css" />
+</head>
+<div class="ccard">
+    <h1 aria-label="Add New Client">
+        <h1 aria-label="Add New Client">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 5V19M5 12H19" stroke="#a65400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            New Client
+        </h1>
+    </h1>
+    <form id="addClientForm" asp-controller="Client" asp-action="AddClients" method="post" class="register-form">
+        <!-- Prospect Field -->
+        <div class="mb-1">
+            <label asp-for="Prospect" class="form-label"></label>
+            <input asp-for="Prospect" class="form-input" placeholder="Enter prospect name" />
+            <span asp-validation-for="Prospect" class="text-danger"></span>
+        </div>
+        <!-- Designation Field -->
+        <div class="mb-1">
+            <label asp-for="Designation" class="form-label"></label>
+            <input asp-for="Designation" class="form-input" placeholder="Enter designation" />
+            <span asp-validation-for="Designation" class="text-danger"></span>
+        </div>
+        <!-- Company Field -->
+        <div class="mb-1">
+            <label asp-for="Company" class="form-label"></label>
+            <input asp-for="Company" class="form-input" placeholder="Enter company name" />
+            <span asp-validation-for="Company" class="text-danger"></span>
+        </div>
+        <!-- Phone Field -->
+        <div class="mb-1">
+            <label asp-for="Phone" class="form-label"></label>
+            <input asp-for="Phone" class="form-input" placeholder="Enter phone number" />
+            <span asp-validation-for="Phone" class="text-danger"></span>
+        </div>
+        <!-- Email Field -->
+        <div class="mb-1">
+            <label asp-for="Email" class="form-label"></label>
+            <input asp-for="Email" class="form-input" placeholder="Enter email address" />
+            <span asp-validation-for="Email" class="text-danger"></span>
+        </div>
+        <!-- Status Field -->
+        <div class="mb-1">
+            <label asp-for="Status" class="form-label"></label>
+            <select asp-for="Status" class="form-input">
+                <option value="For Action" selected>For Action</option>
+                <option value="Texted">Texted</option>
+                <option value="Emailed">Emailed</option>
+                <option value="Called">Called</option>
+            </select>
+            <span asp-validation-for="Status" class="text-danger"></span>
+        </div>
+        <!-- Type Field -->
+        <div class="mb-1">
+            <label asp-for="Type" class="form-label"></label>
+            <select asp-for="Type" class="form-input">
+                <option value="APARTMENT">APARTMENT</option>
+                <option value="SCHOOL">SCHOOL</option>
+                <option value="HOTEL">HOTEL</option>
+                <option value="MIXED-USE">MIXED-USE</option>
+                <option value="MALL">MALL</option>
+                <option value="CHURCH">CHURCH</option>
+                <option value="RESIDENTIAL">RESIDENTIAL</option>
+                <option value="FACTORY">FACTORY</option>
+                <option value="COMMERCIAL BUILDING">COMMERCIAL BUILDING</option>
+            </select>
+            <span asp-validation-for="Type" class="text-danger"></span>
+        </div>
+        <!-- Inquiry Type Field -->
+        <div class="mb-1">
+            <label asp-for="InquiryType" class="form-label"></label>
+            <select asp-for="InquiryType" class="form-input">
+                <option value="Cold Call">Prospect – Cold calls</option>
+                <option value="Marketing Inquiry">Marketing Inquiry – Due to postings and prospecting</option>
+                <option value="Inbound Inquiry">Inbound Inquiry – From social media pages</option>
+            </select>
+            <span asp-validation-for="InquiryType" class="text-danger"></span>
+        </div>
+        @if ((string)ViewData["SessionType"] == "SAdmin")
+        {
+            <!-- Assessment -->
+            <div class="mb-1">
+                <label for="Assessment" class="form-label">Assessment</label>
+            <select name="Assessment" class="form-input" required>
+                <option value="For Assessment" selected>For Assessment</option>
+                <option value="Positive">Positive</option>
+                <option value="Negative">Negative</option>
+            </select>
+            <span class="text-danger"></span>
+            </div>
+        }
+        else
+        {
+            <!-- Assessment -->
+            <div class="mb-3 d-none">
+                <label for="Assessment" class="form-label">Assessment</label>
+                <select name="Assessment" class="form-input" required>
+                    <option value="For Assessment" selected>For Assessment</option>
+                    @* <option value="Positive">Positive</option>
+                <option value="Negative">Negative</option> *@
+                </select>
+                <span class="text-danger"></span>
+            </div>
+        }
+        <!-- Notes Field -->
+        <div class="mb-1 full-width">
+            <label asp-for="Notes" class="form-label"></label>
+            <textarea asp-for="Notes" class="form-input" rows="3" placeholder="Enter notes"></textarea>
+            <span asp-validation-for="Notes" class="text-danger"></span>
+        </div>
+        <!-- AddedBy Field (Hidden) -->
+        <input type="hidden" asp-for="AddedBy" value="@User.Identity.Name" />
+        <!-- Submit Button -->
+        <div class="full-width addbtn">
+            <button type="button" id="openModalBtn" class="cusbtn-primary">Add Client</button>
+        </div>
+    </form>
+
+    <!-- Modal Confirmation -->
+    <div id="confirmationModal" class="modal">
+        <div class="modal-content">
+            <h2>Confirm Submission</h2>
+            <p>Are you sure you want to add this client?</p>
+            <div class="modal-actions">
+                <!-- Submit Form on Confirm -->
+                <button type="submit" id="confirmBtn" class="cusbtn-primary">Yes, Add Client</button>
+
+
+                <button id="cancelBtn" class="cusbtn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        // Modal Functionality
+        const modal = document.getElementById('confirmationModal');
+        const openModalBtn = document.getElementById('openModalBtn');
+        const confirmBtn = document.querySelector('.modal-actions button[type="submit"]');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const form = document.getElementById('addClientForm');
+
+        // Open Modal
+        openModalBtn.addEventListener('click', () => {
+            modal.style.display = 'flex';
+        });
+
+        // Close Modal on Cancel
+        cancelBtn.addEventListener('click', () => {
+            modal.style.display = 'none';
+        });
+
+        // Submit Form on Confirm
+        confirmBtn.addEventListener('click', () => {
+            document.getElementById('addClientForm').submit();
+        });
+
+
+        // Close Modal on Outside Click
+        window.addEventListener('click', (event) => {
+            if (event.target === modal) {
+                modal.style.display = 'none';
+            }
+        });
+    </script>
+}

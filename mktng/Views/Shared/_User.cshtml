@@ -1,0 +1,183 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Marketing</title>
+    <link rel="icon" type="image/x-icon" href="~/images/mktngicon.png" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/all.css" />
+    <!-- Custom CSS -->
+    <style>
+        /* Styles will be added below */
+    </style>
+</head>
+<body>
+    <!-- Mobile Navigation Bar -->
+    <nav class="mobile-nav" id="mobile-nav">
+        <div class="mobile-nav-header">
+            <img src="~/images/topnotch_logo.png" alt="TopNotch Logo" class="mobile-logo" />
+            <button class="toggle-btn mobile-toggle-btn" onclick="toggleMobileNav()">
+                <span class="bar"></span>
+            </button>
+
+        </div>
+        <ul class="mobile-nav-menu" id="mobile-nav-menu">
+            <!-- Clients Dropdown -->
+            <li onclick="toggleMobileDropdown('mobile-clients')">
+                <a href="#"><i class="fas fa-tasks"></i> Clients</a>
+                <ul id="mobile-clients" class="mobile-submenu">
+                    <li><a asp-controller="Client" asp-action="AddClients"><i class="fas fa-magnifying-glass"></i> Add Clients</a></li>
+                    <li><a asp-controller="Client" asp-action="Index"><i class="fas fa-clipboard-list"></i> List of Clients</a></li>
+                    <li><a href="#"><i class="fas fa-clock"></i> For Approval</a></li>
+                </ul>
+            </li>
+            <!-- Office Dropdown -->
+            <li onclick="toggleMobileDropdown('mobile-office')">
+                <a href="#"><i class="fas fa-sitemap"></i> Office</a>
+                <ul id="mobile-office" class="mobile-submenu">
+                    <li>
+                        <a asp-controller="Office" asp-action="Index">
+                            <i class="fas fa-building"></i><span>Offices</span>
+                        </a>
+                    </li>
+
+                    <li>
+                        <a asp-controller="Office" asp-action="AddOffice">
+                            <i class="fas fa-plus-circle"></i><span>Add Office</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            <!-- Account Dropdown -->
+            <li onclick="toggleMobileDropdown('mobile-account')">
+                <a href="#"><i class="fas fa-user-circle"></i> Account</a>
+                <ul id="mobile-account" class="mobile-submenu">
+                    <li><a href="#"><i class="fas fa-user-edit"></i> Change Info</a></li>
+                    <li><a asp-controller="Home" asp-action="Logout"><i class="fas fa-sign-out-alt"></i> Log Out</a></li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Desktop Sidebar Navigation -->
+    <aside class="nav-container" id="nav-container">
+        <!-- Toggle Button -->
+        <button class="toggle-btn" onclick="toggleSidebar()">☰</button>
+        <!-- Navigation Menu -->
+        <ul class="nav-menu">
+            <!-- Clients Dropdown -->
+            <li onclick="toggleDropdown('clients')">
+                <i class="fas fa-tasks" alt="Clients"></i> <span>Clients</span>
+            </li>
+            <ul id="clients" class="submenu">
+
+                <li><a asp-controller="Client" asp-action="AddClients"><i class="fas fa-magnifying-glass"></i><span>Add Clients</span></a></li>
+                <li><a asp-controller="Client" asp-action="Index"><i class="fas fa-clipboard-list" alt="List of Clients"></i><span>Positive Clients</span></a></li>
+                <li><a asp-controller="Admin" asp-action="Pending"><i class="fas fa-clock" alt="For Approval"></i><span>For Approval</span></a></li>
+            </ul>
+            <!-- Office Dropdown -->
+            <li onclick="toggleDropdown('office')">
+                <i class="fas fa-sitemap" alt="Office"></i><span>Office</span>
+            </li>
+            <ul id="office" class="submenu">
+                <li>
+                    <a asp-controller="Office" asp-action="Index">
+                        <i class="fas fa-building"></i><span>Offices</span>
+                    </a>
+                </li>
+
+                <li>
+                    <a asp-controller="Office" asp-action="AddOffice">
+                        <i class="fas fa-plus-circle"></i><span>Add Office</span>
+                    </a>
+                </li>
+
+            </ul>
+            <!-- Account Dropdown -->
+            <li onclick="toggleDropdown('account')">
+                <i class="fas fa-user-circle" alt="Account"></i><span>Account</span>
+            </li>
+            <ul id="account" class="submenu">
+                <li><a asp-controller="Admin" asp-action="ChangeInfo"><i class="fas fa-user-edit" alt="Change Info"></i><span>Change Info</span></a></li>
+                <li><a asp-controller="Home" asp-action="Logout"><i class="fas fa-sign-out-alt" alt="Log Out"></i><span>Log Out</span></a></li>
+            </ul>
+        </ul>
+        <!-- Logo at the Bottom -->
+        <div class="nav-footer">
+            <!-- Full Logo -->
+            <img src="~/images/topnotch_logo.png" alt="TopNotch Logo" class="full-logo" />
+            <!-- Icon Logo -->
+            <img src="~/images/mktngicon.png" alt="TopNotch Icon" class="icon-logo" />
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="admin-footer">
+        <h6 id="clock"></h6>
+    </footer>
+
+    <script>
+        // Clock Script
+        function updateClock() {
+            const now = new Date();
+            const options = {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true,
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            };
+            document.getElementById('clock').textContent = now.toLocaleDateString('en-US', options);
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Sidebar Toggle Functionality
+        function toggleSidebar() {
+            const navContainer = document.getElementById('nav-container');
+            if (window.innerWidth <= 768) {
+                navContainer.classList.toggle('open');
+            } else {
+                navContainer.classList.toggle('collapsed');
+            }
+        }
+
+        // Mobile Nav Toggle Functionality
+        function toggleMobileNav() {
+            const mobileNavMenu = document.getElementById('mobile-nav-menu');
+            const toggleBtn = document.querySelector('.mobile-toggle-btn');
+
+            mobileNavMenu.classList.toggle('show');
+            toggleBtn.classList.toggle('active');
+        }
+
+
+        // Dropdown Toggle Functionality for Desktop
+        function toggleDropdown(id) {
+            const submenu = document.getElementById(id);
+            if (submenu) {
+                submenu.classList.toggle('show');
+            }
+        }
+
+        // Dropdown Toggle Functionality for Mobile
+        function toggleMobileDropdown(id) {
+            const submenu = document.getElementById(id);
+            if (submenu) {
+                submenu.classList.toggle('show');
+            }
+        }
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

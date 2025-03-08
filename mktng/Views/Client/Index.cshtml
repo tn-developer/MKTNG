@@ -1,0 +1,739 @@
+﻿@{
+    ViewData["Title"] = "Client List";
+
+}
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/clientlist.css" />
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <!-- SweetAlert Library -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+</head>
+<div class="ccard">
+    <div class="header-container container-fluid">
+        <!-- Dynamic Header Based on Filters -->
+        <h1 aria-label="Clients" class="d-flex align-items-center gap-3 w-100">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#a65400" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="6" cy="12" r="3" />
+                <circle cx="12" cy="10" r="3" />
+                <circle cx="18" cy="12" r="3" />
+            </svg>
+            <b>
+                @(ViewBag.Assessment == "Positive" ? "For Sales Processing" : "List of Clients")
+            </b>
+        </h1>
+
+        <div class="d-flex flex-column flex-md-row align-items-md-center gap-2 w-100">
+            <!-- Search bar takes most of the space -->
+            <form method="get" action="@Url.Action("Index", new { assessment = ViewBag.Assessment })" class="flex-grow-1">
+                <div class="input-group w-100">
+                    <input type="text" name="searchTerm" class="form-control" placeholder="Search by Company, Designation, or Email..." value="@ViewData["CurrentSearch"]">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-search me-1"></i>
+                    </button>
+                </div>
+            </form>
+
+            <!-- Reset Button -->
+            <a href="@Url.Action("Index", new { assessment = ViewBag.Assessment })" class="btn btn-secondary" style="white-space: nowrap;">
+                <i class="fas fa-sync-alt me-1"></i>
+            </a>
+
+            <!-- Client button gets a fixed width -->
+            <button id="openModalBtn" class="btn btn-success" style="white-space: nowrap;">
+                <i class="fas fa-plus me-1"></i>
+            </button>
+        </div>
+    </div>
+
+    <div style="overflow-x: auto;">
+        <table class="ctable">
+            <thead>
+                <tr>
+                    <th>Prospect</th>
+                    <th>Type</th>
+                    <th>Designation</th>
+                    <th>Company</th>
+                    <th>Phone</th>
+                    <th>Email</th>
+                    <th>Status</th>
+                    <th>Notes</th>
+                    <th>Date Added</th>
+                    <th>Added By</th>
+                    <th>Assessment</th>
+                    <th>Inquiry Type</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var client in Model.Item1)
+                {
+                    <tr data-id="@client.Id">
+                        <td contenteditable="true" onblur="saveCell(this, 'Prospect', @client.Id)">@client.Prospect</td>
+                        <td>
+                            <select onchange="saveDropdown(this, 'Type', @client.Id)">
+                                @{
+                                    var types = new List<string> { "APARTMENT", "SCHOOL", "HOTEL", "MIXED-USE", "MALL", "CHURCH", "RESIDENTIAL", "FACTORY", "COMMERCIAL BUILDING" };
+                                    foreach (var type in types)
+                                    {
+                                        <!option value="@type" @(client.Type.ToUpper() == type ? "selected" : "")>@type</!option>
+                                    }
+                                }
+                            </select>
+                        </td>
+                        <td contenteditable="true" onblur="saveCell(this, 'Designation', @client.Id)">@(client.Designation ?? "N/A")</td>
+                        <td contenteditable="true" onblur="saveCell(this, 'Company', @client.Id)">@client.Company</td>
+                        <td contenteditable="true" onblur="saveCell(this, 'Phone', @client.Id)">@(client.Phone ?? "N/A")</td>
+                        <td contenteditable="true" onblur="saveCell(this, 'Email', @client.Id)">@(client.Email ?? "N/A")</td>
+                        <td>
+                            <select onchange="saveDropdown(this, 'Status', @client.Id)">
+                                @{
+                                    var statuses = new List<string> { "For Action", "Texted", "Emailed", "Called" };
+                                    foreach (var status in statuses)
+                                    {
+                                        <!option value="@status" @(client.Status == status ? "selected" : "")>@status</!option>
+                                    }
+                                }
+                            </select>
+                        </td>
+                        <td contenteditable="true" onblur="saveCell(this, 'Notes', @client.Id)" class="truncate" title="@client.Notes">@client.Notes</td>
+                        <td>@client.DateAdded.ToShortDateString()</td>
+                        <td>@client.AddedBy</td>
+                        <td>
+                            <select onchange="saveDropdown(this, 'Assessment', @client.Id)">
+                                @{
+                                    var assessments = new List<string> { "For Assessment", "Positive", "Negative" };
+                                    foreach (var assessment in assessments)
+                                    {
+                                        <!option value="@assessment" @(client.Assessment == assessment ? "selected" : "")>@assessment</!option>
+                                    }
+                                }
+                            </select>
+                        </td>
+                        <td>@(client.InquiryType ?? "N/A")</td>
+                        <td>
+                            <button class="action-icon edit-btn btn btn-link" title="Edit" data-id="@client.Id">
+                                <i class="fas fa-edit" style="color: #2f241d;"></i>
+                            </button>
+                            @if (@ViewBag.Assessment == "Positive")
+                            {
+                                <button class="action-icon assign-btn btn btn-link" title="Assign Task" data-id="@client.Id">
+                                    <i class="fas fa-clipboard-list" style="color: #FFAD33;"></i>
+                                </button>
+                            }
+                            else
+                            {
+                                <button class="action-icon delete-btn btn btn-link" title="Delete" data-id="@client.Id">
+                                    <i class="fas fa-trash-alt" style="color: #e74c3c;"></i>
+                                </button>
+                                
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <nav aria-label="Page navigation">
+            <ul class="pagination justify-content-center">
+                @if (ViewBag.PageNumber > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Index", new { assessment = ViewBag.Assessment, searchTerm = ViewData["CurrentSearch"], pageNumber = ViewBag.PageNumber - 1 })">Previous</a>
+                    </li>
+                }
+
+                @{
+                    int maxPagesToShow = 10;
+                    int startPage = Math.Max(1, ViewBag.PageNumber - (maxPagesToShow / 2));
+                    int endPage = Math.Min(ViewBag.TotalPages, startPage + maxPagesToShow - 1);
+
+                    // Adjust startPage if endPage is at the last page
+                    if (endPage - startPage < maxPagesToShow - 1)
+                    {
+                        startPage = Math.Max(1, endPage - maxPagesToShow + 1);
+                    }
+                }
+
+                @for (int i = startPage; i <= endPage; i++)
+                {
+                    <li class="page-item @(i == ViewBag.PageNumber ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Index", new { assessment = ViewBag.Assessment, searchTerm = ViewData["CurrentSearch"], pageNumber = i })">@i</a>
+                    </li>
+                }
+
+                @if (ViewBag.PageNumber < ViewBag.TotalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Index", new { assessment = ViewBag.Assessment, searchTerm = ViewData["CurrentSearch"], pageNumber = ViewBag.PageNumber + 1 })">Next</a>
+                    </li>
+                }
+            </ul>
+        </nav>
+    </div>
+</div>
+
+
+    <!-- Modal for Adding a New Client -->
+    <div id="newClientModal" class="modal">
+        <div class="modal-content">
+            <h2>Add New Client</h2>
+            <form id="addClientForm" asp-controller="Client" asp-action="AddClients" method="post" class="register-form">
+                <!-- Prospect Field -->
+                <div class="mb-3">
+                    <label for="Prospect" class="form-label">Prospect</label>
+                    <input type="text" name="Prospect" class="form-input" placeholder="Enter prospect name" required />
+                    <span class="text-danger"></span>
+                </div>
+                <!-- Designation Field -->
+                <div class="mb-3">
+                    <label for="Designation" class="form-label">Designation</label>
+                    <input type="text" name="Designation" class="form-input" placeholder="Enter designation" />
+                    <span class="text-danger"></span>
+                </div>
+                <!-- Company Field -->
+                <div class="mb-3">
+                    <label for="Company" class="form-label">Company</label>
+                    <input type="text" name="Company" class="form-input" placeholder="Enter company name" required />
+                    <span class="text-danger"></span>
+                </div>
+                <!-- Phone Field -->
+                <div class="mb-3">
+                    <label for="Phone" class="form-label">Phone</label>
+                    <input type="tel" name="Phone" class="form-input" placeholder="Enter phone number" />
+                    <span class="text-danger"></span>
+                </div>
+                <!-- Email Field -->
+                <div class="mb-3">
+                    <label for="Email" class="form-label">Email</label>
+                    <input type="email" name="Email" class="form-input" placeholder="Enter email address" />
+                    <span class="text-danger"></span>
+                </div>
+                <!-- Status Field -->
+                <div class="mb-3">
+                    <label for="Status" class="form-label">Status</label>
+                    <select name="Status" class="form-input" required>
+                        <option value="For Action" selected>For Action</option>
+                        <option value="Texted">Texted</option>
+                        <option value="Emailed">Emailed</option>
+                        <option value="Called">Called</option>
+                    </select>
+                    <span class="text-danger"></span>
+                </div>
+                <!-- Type Field -->
+                <div class="mb-3">
+                    <label for="Type" class="form-label">Type</label>
+                    <select name="Type" class="form-input" required>
+                        <option value="APARTMENT">APARTMENT</option>
+                        <option value="SCHOOL">SCHOOL</option>
+                        <option value="HOTEL">HOTEL</option>
+                        <option value="MIXED-USE">MIXED-USE</option>
+                        <option value="MALL">MALL</option>
+                        <option value="CHURCH">CHURCH</option>
+                        <option value="RESIDENTIAL">RESIDENTIAL</option>
+                        <option value="FACTORY">FACTORY</option>
+                        <option value="COMMERCIAL BUILDING">COMMERCIAL BUILDING</option>
+                    </select>
+                    <span class="text-danger"></span>
+                </div>
+                <!-- InquiryType Field -->
+                <div class="mb-3">
+                    <label for="InquiryType" class="form-label">Inquiry Type</label>
+                    <select name="InquiryType" class="form-input" required>
+                        <option value="Cold Call">Prospect – Cold calls</option>
+                        <option value="Marketing Inquiry">Marketing Inquiry – Due to postings and prospecting</option>
+                        <option value="Inbound Inquiry">Inbound Inquiry – From social media pages</option>
+                    </select>
+                    <span class="text-danger"></span>
+                </div>
+                @if ((string)ViewData["SessionType"] == "SAdmin")
+                {
+                    <!-- Assessment -->
+                    <div class="mb-3">
+                        <label for="Assessment" class="form-label">Assessment</label>
+                        <select name="Assessment" class="form-input" required>
+                            <option value="For Assessment" selected>For Assessment</option>
+                            <option value="Positive">Positive</option>
+                            <option value="Negative">Negative</option>
+                        </select>
+                        <span class="text-danger"></span>
+                    </div>
+                }
+                else
+                {
+                    <!-- Assessment -->
+                    <div class="mb-3 d-none">
+                        <label for="Assessment" class="form-label">Assessment</label>
+                        <select name="Assessment" class="form-input" required>
+                            <option value="For Assessment" selected>For Assessment</option>
+                            @* <option value="Positive">Positive</option>
+                            <option value="Negative">Negative</option> *@
+                        </select>
+                        <span class="text-danger"></span>
+                    </div>
+                }
+                <!-- Notes Field -->
+                <div class="mb-3 full-width">
+                    <label for="Notes" class="form-label">Notes</label>
+                    <textarea name="Notes" class="form-input" rows="3" placeholder="Enter notes"></textarea>
+                    <span class="text-danger"></span>
+                </div>
+                <!-- Submit Button -->
+                <div class="modal-actions">
+                    <button type="submit" class="cusbtn-primary">Save Client</button>
+                    <button type="button" id="closeModalBtn" class="cusbtn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Editing a Client -->
+    <div id="editClientModal" class="modal">
+        <div class="modal-content">
+            <h2>Edit Client</h2>
+            <form id="editClientForm" method="post" class="register-form">
+                <!-- Hidden Input for Client ID -->
+                <input type="hidden" id="editClientId" name="Id" />
+
+                <!-- Prospect Field -->
+                <div class="mb-3">
+                    <label for="editProspect" class="form-label">Prospect</label>
+                    <input type="text" id="editProspect" name="Prospect" class="form-input" placeholder="Enter prospect name" required />
+                    <span class="text-danger"></span>
+                </div>
+
+                <!-- Designation Field -->
+                <div class="mb-3">
+                    <label for="editDesignation" class="form-label">Designation</label>
+                    <input type="text" id="editDesignation" name="Designation" class="form-input" placeholder="Enter designation" />
+                    <span class="text-danger"></span>
+                </div>
+
+                <!-- Company Field -->
+                <div class="mb-3">
+                    <label for="editCompany" class="form-label">Company</label>
+                    <input type="text" id="editCompany" name="Company" class="form-input" placeholder="Enter company name" required />
+                    <span class="text-danger"></span>
+                </div>
+
+                <!-- Phone Field -->
+                <div class="mb-3">
+                    <label for="editPhone" class="form-label">Phone</label>
+                    <input type="tel" id="editPhone" name="Phone" class="form-input" placeholder="Enter phone number" />
+                    <span class="text-danger"></span>
+                </div>
+
+                <!-- Email Field -->
+                <div class="mb-3">
+                    <label for="editEmail" class="form-label">Email</label>
+                    <input type="email" id="editEmail" name="Email" class="form-input" placeholder="Enter email address" />
+                    <span class="text-danger"></span>
+                </div>
+
+                <!-- Status Field -->
+                <div class="mb-3">
+                    <label for="editStatus" class="form-label">Status</label>
+                    <select id="editStatus" name="Status" class="form-input" required>
+                        <option value="For Action">For Action</option>
+                        <option value="Texted">Texted</option>
+                        <option value="Emailed">Emailed</option>
+                        <option value="Called">Called</option>
+                    </select>
+                    <span class="text-danger"></span>
+                </div>
+
+                <!-- Type Field -->
+                <div class="mb-3">
+                    <label for="editType" class="form-label">Type</label>
+                    <select id="editType" name="Type" class="form-input" required>
+                        <option value="APARTMENT">APARTMENT</option>
+                        <option value="SCHOOL">SCHOOL</option>
+                        <option value="HOTEL">HOTEL</option>
+                        <option value="MIXED-USE">MIXED-USE</option>
+                        <option value="MALL">MALL</option>
+                        <option value="CHURCH">CHURCH</option>
+                        <option value="RESIDENTIAL">RESIDENTIAL</option>
+                        <option value="FACTORY">FACTORY</option>
+                        <option value="COMMERCIAL BUILDING">COMMERCIAL BUILDING</option>
+                    </select>
+                    <span class="text-danger"></span>
+                </div>
+
+                <!-- Assessment -->
+                @if ((string)ViewData["SessionType"] == "SAdmin")
+                {
+                    <div class="mb-3">
+                        <label for="editAssessment" class="form-label">Assessment</label>
+                        <select id="editAssessment" name="Assessment" class="form-input" required>
+                            <option value="For Assessment">For Assessment</option>
+                            <option value="Positive">Positive</option>
+                            <option value="Negative">Negative</option>
+                        </select>
+                        <span class="text-danger"></span>
+                    </div>
+                }
+                else
+                {
+                    <div class="mb-3 d-none">
+                        <label for="editAssessment" class="form-label">Assessment</label>
+                        <select id="editAssessment" name="Assessment" class="form-input" required disabled>
+                            <option value="For Assessment">For Assessment</option>
+@*                             <option value="Positive">Positive</option>
+                            <option value="Negative">Negative</option> *@
+                        </select>
+                        <span class="text-danger"></span>
+                    </div>
+                }
+                <!-- Notes Field -->
+                <div class="mb-3 full-width">
+                    <label for="editNotes" class="form-label">Notes</label>
+                    <textarea id="editNotes" name="Notes" class="form-input" rows="3" placeholder="Enter notes"></textarea>
+                    <span class="text-danger"></span>
+                </div>
+
+
+                <!-- Submit Button -->
+                <div class="modal-actions">
+                    <button type="submit" class="cusbtn-primary">Update Client</button>
+                    <button type="button" id="closeEditModalBtn" class="cusbtn-secondary">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal for Deleting a Client -->
+    <div id="deleteClientModal" class="modal">
+        <div class="modal-content">
+            <h2>Confirm Deletion</h2>
+            <p>Are you sure you want to delete this client?</p>
+            <!-- Reason Input Field -->
+            <div class="mb-3">
+                <label for="deleteReason" class="form-label">Reason for Deletion</label>
+                <textarea id="deleteReason" class="form-input" rows="3" placeholder="Enter reason for deletion" required></textarea>
+                <span class="text-danger"></span>
+            </div>
+            <div class="modal-actions">
+                <button id="confirmDeleteBtn" class="cusbtn-primary">Yes, Delete</button>
+                <button id="cancelDeleteBtn" class="cusbtn-secondary">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // console.log(@ViewBag.PageNumber);
+
+        // console.log(@ViewBag.TotalPages);
+
+        // console.log(@ViewBag.TotalRecords);
+        // General Modal Functionality
+        const openModal = (modal) => modal.style.display = 'flex';
+        const closeModal = (modal) => modal.style.display = 'none';
+
+        // Modals
+        const newClientModal = document.getElementById('newClientModal');
+        const editClientModal = document.getElementById('editClientModal');
+        const deleteClientModal = document.getElementById('deleteClientModal');
+
+        // Buttons
+        const openNewClientModalBtn = document.getElementById('openModalBtn');
+        const closeNewClientModalBtn = document.getElementById('closeModalBtn');
+        const closeEditModalBtn = document.getElementById('closeEditModalBtn');
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+
+        // Event Listeners for New Client Modal
+        openNewClientModalBtn.addEventListener('click', () => openModal(newClientModal));
+        closeNewClientModalBtn.addEventListener('click', () => closeModal(newClientModal));
+
+        // Event Listeners for Edit Client Modal
+        closeEditModalBtn.addEventListener('click', () => closeModal(editClientModal));
+
+        // Event Listeners for Delete Client Modal
+        cancelDeleteBtn.addEventListener('click', () => closeModal(deleteClientModal));
+
+        // Close Modals on Outside Click
+        window.addEventListener('click', (event) => {
+            if (event.target === newClientModal) closeModal(newClientModal);
+            if (event.target === editClientModal) closeModal(editClientModal);
+            if (event.target === deleteClientModal) closeModal(deleteClientModal);
+        });
+
+        // Edit Client Modal
+        const editButtons = document.querySelectorAll('.edit-btn');
+        editButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                // Get the row containing the client data
+                const row = button.closest('tr');
+                const clientId = row.dataset.id;
+                // Extract data from the table row
+                const prospect = row.cells[0].textContent.trim();
+                const type = row.cells[1].querySelector('select').value;
+                const designation = row.cells[2].textContent.trim() === "N/A" ? "" : row.cells[2].textContent.trim();
+                const company = row.cells[3].textContent.trim();
+                const phone = row.cells[4].textContent.trim() === "N/A" ? "" : row.cells[4].textContent.trim();
+                const email = row.cells[5].textContent.trim() === "N/A" ? "" : row.cells[5].textContent.trim();
+                const status = row.cells[6].querySelector('select').value;
+                const notes = row.cells[7].textContent.trim();
+                const assessment = row.cells[10].querySelector('select').value;
+                console.log({
+                    prospect,
+                    type,
+                    designation,
+                    company,
+                    phone,
+                    email,
+                    status,
+                    notes,
+                    assessment,
+                });
+                // Populate the form fields in the Edit modal
+                document.getElementById('editClientId').value = clientId;
+                document.getElementById('editProspect').value = prospect;
+                document.getElementById('editDesignation').value = designation;
+                document.getElementById('editCompany').value = company;
+                document.getElementById('editPhone').value = phone;
+                document.getElementById('editEmail').value = email;
+                document.getElementById('editStatus').value = status;
+                document.getElementById('editType').value = type;
+                document.getElementById('editNotes').value = notes;             // Populate Added By
+                document.getElementById('editAssessment').value = assessment;
+
+                // Open the Edit modal
+                openModal(editClientModal);
+            });
+        }); // <-- Closing bracket added here
+
+        // Handle Edit Form Submission
+        document.getElementById('editClientForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const client = {
+                Id: document.getElementById('editClientId').value,
+                Prospect: document.getElementById('editProspect').value,
+                Designation: document.getElementById('editDesignation').value,
+                Company: document.getElementById('editCompany').value,
+                Phone: document.getElementById('editPhone').value,
+                Email: document.getElementById('editEmail').value,
+                Status: document.getElementById('editStatus').value,
+                Type: document.getElementById('editType').value,
+                Notes: document.getElementById('editNotes').value,
+                Assessment: document.getElementById('editAssessment').value
+            };
+
+            const response = await fetch('/Client/EditClient', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: JSON.stringify(client)
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Client updated successfully!',
+                    confirmButtonColor: '#42ab49'
+                });
+
+                const row = document.querySelector(`tr[data-id="${result.client.id}"]`);
+
+                // Update Prospect (plain text)
+                row.cells[0].textContent = result.client.prospect;
+
+                // Update Type (dropdown)
+                const typeSelect = row.cells[1].querySelector('select');
+                if (typeSelect) {
+                    typeSelect.value = result.client.type;
+                }
+
+                // Update Designation (plain text)
+                row.cells[2].textContent = result.client.designation || 'N/A';
+
+                // Update Company (plain text)
+                row.cells[3].textContent = result.client.company;
+
+                // Update Phone (plain text)
+                row.cells[4].textContent = result.client.phone || 'N/A';
+
+                // Update Email (plain text)
+                row.cells[5].textContent = result.client.email || 'N/A';
+
+                // Update Status (dropdown)
+                const statusSelect = row.cells[6].querySelector('select');
+                if (statusSelect) {
+                    statusSelect.value = result.client.status;
+                }
+
+                // Update Notes (plain text)
+                row.cells[7].textContent = result.client.notes || '';
+
+                // Update Assessment (dropdown)
+                const assessmentSelect = row.cells[10].querySelector('select');
+                if (assessmentSelect) {
+                    assessmentSelect.value = result.client.assessment;
+                }
+
+                closeModal(editClientModal);
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: result.message,
+                    confirmButtonColor: '#e74c3c'
+                });
+            }
+        });
+
+        // Function to save the edited cell value
+        function saveCell(cell, field, id) {
+            const newValue = cell.innerText.trim();
+            console.log(`Saving ${field} for ID ${id}: ${newValue}`);
+
+            // Send an AJAX request to update the database
+            fetch('/Client/UpdateField', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: id,
+                    field: field,
+                    value: newValue
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Update successful');
+                    } else {
+                        alert('Failed to update the record.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while saving the changes.');
+                });
+        }
+        // Function to save the selected dropdown value
+        function saveDropdown(selectElement, field, id) {
+            const newValue = selectElement.value; // Get the selected value
+            console.log(`Saving ${field} for ID ${id}: ${newValue}`);
+
+            // Send an AJAX request to update the database
+            fetch('/Client/UpdateField', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    id: id,
+                    field: field,
+                    value: newValue
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Update successful');
+                    } else {
+                        alert('Failed to update the record.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred while saving the changes.');
+                });
+        }
+        // Delete Client Modal
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+        let clientIdToDelete;
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                clientIdToDelete = button.dataset.id;
+                openModal(deleteClientModal);
+            });
+        });
+
+        // Handle Confirm Delete
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+            const reason = document.getElementById('deleteReason').value.trim();
+            if (!reason) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: 'Please provide a reason for deletion.',
+                    confirmButtonColor: '#e74c3c'
+                });
+                return;
+            }
+
+            const response = await fetch(`/Client/DeleteClient/${clientIdToDelete}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value
+                },
+                body: JSON.stringify({ reason }) // Send the reason as part of the request body
+            });
+
+            const result = await response.json();
+            if (result.success) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success!',
+                    text: 'Client marked as deleted successfully!',
+                    confirmButtonColor: '#d74a49'
+                });
+
+                // Remove the row from the table dynamically
+                const row = document.querySelector(`tr[data-id="${clientIdToDelete}"]`);
+                row.remove();
+            } else {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error!',
+                    text: result.message,
+                    confirmButtonColor: '#d74a49'
+                });
+            }
+
+            closeModal(deleteClientModal);
+        });
+        // Function to apply background color based on assessment
+        function applyRowColors() {
+            const rows = document.querySelectorAll('.ctable tbody tr');
+            rows.forEach(row => {
+                const assessmentCell = row.querySelector('td:nth-child(11) select'); // 11th column (Assessment)
+                if (assessmentCell) {
+                    const assessmentValue = assessmentCell.value;
+                    if (assessmentValue === 'Positive') {
+                        row.style.backgroundColor = '#e8f5e9';
+                    } else if (assessmentValue === 'Negative') {
+                        row.style.backgroundColor = '#ffebee'; 
+                    } else {
+                        row.style.backgroundColor = ''; // Reset for other values
+                    }
+                }
+            });
+        }
+
+        // Call the function after the table is rendered
+        document.addEventListener('DOMContentLoaded', () => {
+            applyRowColors();
+
+            // Reapply colors when dropdown values change
+            const dropdowns = document.querySelectorAll('.ctable tbody tr td:nth-child(11) select');
+            dropdowns.forEach(dropdown => {
+                dropdown.addEventListener('change', applyRowColors);
+            });
+        });
+    </script>
+}

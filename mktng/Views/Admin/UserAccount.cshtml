@@ -1,0 +1,85 @@
+﻿@{
+    ViewData["Title"] = "User Verification";
+}
+<head>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="~/css/userlist.css" />
+</head>
+<h1 style="text-align:center">User Registration Approval</h1>
+<div class="ccard" style="overflow-x: auto; max-width: 100%; border: 1px solid darkgray; border-collapse: collapse;">
+    <table class="ctable ctable-hover ctable-responsive-sm ctable-sm" id="datatable" style="width: 100%; white-space: nowrap;">
+        <thead>
+            <tr>
+                <th class="text-center text-uppercase">Name</th>
+                <th class="text-center text-uppercase">Office</th>
+                <th class="text-center text-uppercase">Position</th>
+                <th class="text-center text-uppercase">Action</th>
+            </tr>
+        </thead>
+        <tbody id="myTable">
+            @foreach (System.Data.DataRow dr in ViewBag.users.Rows)
+            {
+                <tr>
+                    <td class="text-center text-nowrap">@dr["Name"].ToString()</td>
+                    <td class="text-center text-nowrap">@dr["Office"].ToString()</td>
+                    <td class="text-center text-nowrap">@dr["Position"].ToString()</td>
+                    <td>
+                        <div class="modal fade" id="Approve_@dr["Id"].ToString()" tabindex="-1" aria-labelledby="ApproveModalLabel_@dr["Id"].ToString()" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="ApproveModalLabel_@dr["Id"].ToString()">Approve User</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form asp-controller="Admin" asp-action="UserAccount" method="post">
+                                            <div>
+                                                <p>Are you sure you want to approve user @dr["Name"].ToString(): @dr["Position"].ToString()?</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <input type="hidden" name="stat" value="Active"/>
+                                                <input type="hidden" name="userId" value="@dr["Id"].ToString()"/>
+                                                <button type="submit" class="cusbtn-primary">Confirm</button>
+                                                <button type="button" class="cusbtn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="modal fade" id="Decline_@dr["Id"].ToString()" tabindex="-1" aria-labelledby="DeclineModalLabel_@dr["Id"].ToString()" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="DeclineModalLabel_@dr["Id"].ToString()">Decline User</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form asp-controller="Admin" asp-action="UserAccount" method="post">
+                                            <p>Are you sure you want to decline user @dr["Name"].ToString(): @dr["Position"].ToString()?</p>
+                                            <div class="modal-footer">
+                                                <input type="hidden" name="stat" value="Declined"/>
+                                                <input type="hidden" name="userId" value="@dr["Id"].ToString()"/>
+                                                <button type="button" class="cusbtn-secondary">Confirm</button>
+                                                <button type="button" class="cusbtn-secondary" data-bs-dismiss="modal">Close</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-center">
+                            <button type="button" class="cusbtn-success rm-3 me-2" data-bs-toggle="modal" data-bs-target="#Approve_@dr["Id"].ToString()">Approve</button>
+                            <button type="button" class="cusbtn-danger" data-bs-toggle="modal" data-bs-target="#Decline_@dr["Id"].ToString()">Decline</button>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </Table>
+</div>
